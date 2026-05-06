@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Vibe-HTML Viewer</title>
+    <title>Aura HTML - Workspace</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
     
     <!-- CodeMirror for Syntax Highlighting -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/codemirror.min.css">
@@ -22,9 +22,10 @@
             --md-primary: #5c8d42; /* Matcha Green */
         }
         body {
-            font-family: 'Roboto', sans-serif;
-            background-color: var(--md-bg);
-            color: #202124;
+            font-family: 'Inter', sans-serif;
+            letter-spacing: -0.015em;
+            background-color: #ffffff;
+            color: #171717;
             height: 100vh;
             overflow: hidden;
         }
@@ -81,104 +82,167 @@
 <body class="flex flex-col">
 
     <!-- Header / App Bar -->
-    <header class="bg-[#5c8d42] text-white h-16 flex justify-between items-center px-6 material-shadow z-20 shrink-0">
+    <header class="bg-[#5c8d42] text-white h-16 flex justify-between items-center px-8 shadow-sm z-20 shrink-0">
         <div class="flex items-center gap-4">
-            <button id="btn-back" onclick="showDashboard()" class="hidden hover:bg-[#4a7235] p-2 rounded-full transition -ml-2" title="Kembali ke Dashboard">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <button id="btn-back" onclick="showDashboard()" class="hidden hover:bg-[#4a7235] p-2 rounded-full transition -ml-2 text-white" title="Kembali ke Dashboard">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
                 </svg>
             </button>
-            <div class="flex items-center gap-2">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
-                </svg>
-                <h1 class="text-xl font-medium tracking-wide">Vibe-HTML</h1>
+            <div class="flex items-center gap-2.5">
+                <div class="w-6 h-6 bg-white rounded flex items-center justify-center text-[#5c8d42]">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
+                    </svg>
+                </div>
+                <h1 class="text-lg font-semibold tracking-tight">Aura</h1>
             </div>
         </div>
         
         <!-- File Name Wrapper -->
         <div id="file-name-wrapper" class="hidden items-center gap-2">
-            <div id="active-file-name-container" class="flex items-center gap-2 bg-green-800 hover:bg-green-700 px-4 py-1.5 rounded-full cursor-pointer transition shadow-sm" onclick="enableRename()" title="Klik untuk mengubah nama">
-                <span id="active-file-name" class="text-sm font-medium truncate max-w-[200px] md:max-w-md"></span>
+            <div id="active-file-name-container" class="flex items-center gap-2 hover:bg-[#4a7235] px-3 py-1.5 rounded-md cursor-pointer transition border border-transparent" onclick="enableRename()" title="Klik untuk mengubah nama">
+                <span id="active-file-name" class="text-sm font-medium text-white truncate max-w-[200px] md:max-w-md"></span>
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 text-green-200" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
                 </svg>
             </div>
-            <input type="text" id="rename-input" class="hidden text-sm font-medium bg-green-900 text-white px-4 py-1.5 rounded-full outline-none focus:ring-2 focus:ring-green-400 w-48 md:w-64 transition" />
+            <input type="text" id="rename-input" class="hidden text-sm font-medium bg-green-900 text-white border border-green-700 px-3 py-1.5 rounded-md outline-none focus:border-green-300 focus:ring-1 focus:ring-green-300 w-48 md:w-64 transition" />
         </div>
     </header>
 
     <main class="flex-1 flex overflow-hidden relative">
         
-        <!-- ================= DASHBOARD VIEW ================= -->
-        <section id="dashboard-view" class="flex-1 flex flex-col items-center pt-16 px-6 overflow-y-auto w-full">
-            <div class="w-full max-w-3xl flex justify-center items-center relative mb-10">
-                <h2 class="text-3xl font-light text-gray-800">Mulai Sesi Baru</h2>
-                <button onclick="openPromptManager()" class="absolute right-0 flex items-center gap-2 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 px-4 py-2.5 rounded-full border border-indigo-200 transition text-sm font-medium shadow-sm">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" /></svg>
-                    Kelola Prompt AI
-                </button>
-            </div>
+        <!-- ================= DASHBOARD VIEW (SIDEBAR LAYOUT) ================= -->
+        <section id="dashboard-view" class="flex-1 flex w-full h-full bg-white overflow-hidden">
             
-            <div class="flex flex-wrap gap-6 mb-16 justify-center w-full max-w-3xl">
-                <button onclick="createNewFile()" class="flex-1 min-w-[250px] bg-white p-8 rounded-2xl material-shadow material-shadow-hover transition flex flex-col items-center justify-center gap-4 group border border-transparent hover:border-green-200">
-                    <div class="p-4 bg-green-50 rounded-full group-hover:bg-green-100 transition">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-[#5c8d42]" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" /></svg>
-                    </div>
-                    <span class="text-lg font-medium text-gray-800">Proyek HTML Baru</span>
-                    <span class="text-sm text-gray-500">Mulai dari kanvas kosong</span>
-                </button>
-
-                <input type="file" id="file-input" accept=".html,.htm,.txt" class="hidden">
-                <button onclick="document.getElementById('file-input').click()" class="flex-1 min-w-[250px] bg-white p-8 rounded-2xl material-shadow material-shadow-hover transition flex flex-col items-center justify-center gap-4 group border border-transparent hover:border-green-200">
-                    <div class="p-4 bg-green-50 rounded-full group-hover:bg-green-100 transition">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-[#5c8d42]" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" /></svg>
-                    </div>
-                    <span class="text-lg font-medium text-gray-800">Buka File Perangkat</span>
-                    <span class="text-sm text-gray-500">Pilih file HTML lokal</span>
-                </button>
-            </div>
-
-            <div class="w-full max-w-4xl bg-white rounded-2xl material-shadow overflow-hidden flex flex-col">
-                <div class="px-6 py-4 border-b bg-gray-50 flex justify-between items-center">
-                    <h3 class="text-lg font-medium text-gray-700 flex items-center gap-2">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd" /></svg>
-                        Riwayat Proyek
-                    </h3>
-                    <button onclick="clearHistory()" class="text-sm text-red-500 hover:text-red-700 hover:underline">Hapus Semua</button>
+            <!-- Sidebar History (Minimalist) -->
+            <aside class="w-[300px] bg-[#fafafa] border-r border-gray-200 flex flex-col shrink-0 relative z-10">
+                <div class="px-6 py-8 flex justify-between items-end shrink-0">
+                    <h3 class="text-xs font-semibold tracking-widest text-gray-400 uppercase">Riwayat Proyek</h3>
+                    <button onclick="clearHistory()" class="text-xs font-medium text-gray-400 hover:text-black transition" title="Hapus Semua Riwayat">Clear</button>
                 </div>
-                <div id="dashboard-history-list" class="flex-1 max-h-[400px] overflow-y-auto p-2"></div>
+                <div id="dashboard-history-list" class="flex-1 overflow-y-auto px-4 pb-6 flex flex-col gap-1">
+                    <!-- List history akan dirender di sini via JS -->
+                </div>
+            </aside>
+
+            <!-- Main Dashboard Area (Negative Space) -->
+            <div class="flex-1 flex flex-col items-start justify-start p-10 md:p-16 pt-32 md:pt-32 overflow-y-auto bg-white relative">
+                
+                <div class="absolute top-8 right-8 md:right-12 z-20">
+                    <button onclick="openPromptManager()" class="flex items-center gap-2 bg-white border border-gray-200 hover:border-black text-gray-700 px-5 py-2.5 rounded-lg transition-all text-sm font-medium">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" /></svg>
+                        Koleksi Prompt
+                    </button>
+                </div>
+
+                <div class="w-full max-w-6xl mx-auto flex flex-col lg:flex-row items-center justify-between gap-12 lg:gap-24 pl-4">
+                    
+                    <!-- Kiri: Copywriting & Actions -->
+                    <div class="flex-1 flex flex-col justify-center items-start max-w-2xl z-10">
+                        <div class="mb-12 mt-4 lg:mt-0">
+                            <h2 class="text-4xl md:text-5xl font-bold text-black tracking-tight leading-tight mb-4">Ruang Kedap Suara<br>Untuk Naskah Anda.</h2>
+                            <p class="text-gray-500 text-lg font-light tracking-wide max-w-lg leading-relaxed">Setiap baris kode adalah dialog, dan Anda sutradaranya. Mari ciptakan karya berikutnya.</p>
+                        </div>
+                        
+                        <div class="flex flex-col sm:flex-row gap-6 justify-start w-full">
+                            <!-- Create New Card -->
+                            <button onclick="createNewFile()" class="flex-1 text-left bg-white p-10 rounded-2xl transition-all group border border-gray-200 hover:border-[#5c8d42] hover:shadow-md relative overflow-hidden">
+                                <div class="absolute inset-0 bg-gradient-to-br from-green-50/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                                <div class="relative z-10">
+                                    <div class="w-12 h-12 bg-green-50 rounded-full flex items-center justify-center group-hover:bg-[#5c8d42] group-hover:text-white text-[#5c8d42] transition-colors duration-300 mb-8">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" /></svg>
+                                    </div>
+                                    <span class="block text-xl font-bold text-gray-800 mb-2 group-hover:text-[#5c8d42] transition-colors tracking-tight">Lembaran Baru</span>
+                                    <span class="text-sm text-gray-500 leading-relaxed font-light block">Kanvas putih menanti goresan pertama dari imajinasi Anda.</span>
+                                </div>
+                            </button>
+
+                            <!-- Open File Card -->
+                            <input type="file" id="file-input" accept=".html,.htm,.txt" class="hidden">
+                            <button onclick="document.getElementById('file-input').click()" class="flex-1 text-left bg-white p-10 rounded-2xl transition-all group border border-gray-200 hover:border-[#5c8d42] hover:shadow-md relative overflow-hidden">
+                                <div class="absolute inset-0 bg-gradient-to-br from-green-50/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                                <div class="relative z-10">
+                                    <div class="w-12 h-12 bg-green-50 rounded-full flex items-center justify-center group-hover:bg-[#5c8d42] group-hover:text-white text-[#5c8d42] transition-colors duration-300 mb-8">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" /></svg>
+                                    </div>
+                                    <span class="block text-xl font-bold text-gray-800 mb-2 group-hover:text-[#5c8d42] transition-colors tracking-tight">Lanjutkan Cerita</span>
+                                    <span class="text-sm text-gray-500 leading-relaxed font-light block">Bangkitkan kembali karya indah yang sempat tertunda.</span>
+                                </div>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Kanan: SVG Hero Illustration (Aura & Canvas) -->
+                    <div class="hidden lg:flex flex-1 justify-center items-center pointer-events-none transform hover:scale-105 transition-transform duration-1000 ease-out">
+                        <svg viewBox="0 0 600 600" fill="none" xmlns="http://www.w3.org/2000/svg" class="w-full max-w-[500px] xl:max-w-[600px] drop-shadow-2xl opacity-90">
+                            <!-- Background Aura Glows -->
+                            <circle cx="300" cy="300" r="220" fill="#5c8d42" opacity="0.04" />
+                            <circle cx="350" cy="250" r="160" fill="#5c8d42" opacity="0.06" />
+                            <circle cx="240" cy="350" r="120" fill="#5c8d42" opacity="0.03" />
+                            
+                            <!-- Background Floating Document -->
+                            <g transform="rotate(-8 300 300)">
+                                <rect x="160" y="140" width="260" height="340" rx="20" fill="white" stroke="#f3f4f6" stroke-width="2" />
+                                <rect x="210" y="210" width="140" height="8" rx="4" fill="#f3f4f6" />
+                                <rect x="210" y="240" width="180" height="8" rx="4" fill="#f3f4f6" />
+                                <rect x="210" y="270" width="100" height="8" rx="4" fill="#f3f4f6" />
+                                <!-- Highlight Code Line -->
+                                <rect x="210" y="320" width="160" height="10" rx="5" fill="#5c8d42" opacity="0.15" />
+                                <rect x="210" y="320" width="90" height="10" rx="5" fill="#5c8d42" />
+                            </g>
+
+                            <!-- Foreground Floating Document (The Active Canvas) -->
+                            <g transform="rotate(6 300 300)">
+                                <rect x="250" y="180" width="200" height="260" rx="20" fill="white" stroke="#e5e7eb" stroke-width="2" style="filter: drop-shadow(0 25px 35px rgba(0,0,0,0.08));" />
+                                <!-- Aesthetic Code Symbol inside Foreground Canvas -->
+                                <path d="M310 270 L280 300 L310 330" stroke="#5c8d42" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" />
+                                <path d="M430 270 L460 300 L430 330" stroke="#5c8d42" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" />
+                                <path d="M390 250 L350 350" stroke="#5c8d42" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" opacity="0.3" />
+                            </g>
+
+                            <!-- Scriptwriter/Aura Sparkles -->
+                            <path d="M500 130 L505 150 L525 155 L505 160 L500 180 L495 160 L475 155 L495 150 Z" fill="#5c8d42" opacity="0.25" />
+                            <path d="M100 420 L104 433 L117 437 L104 441 L100 454 L96 441 L83 437 L96 433 Z" fill="#5c8d42" opacity="0.2" />
+                            <circle cx="140" cy="180" r="5" fill="#5c8d42" opacity="0.3" />
+                            <circle cx="480" cy="480" r="8" fill="#5c8d42" opacity="0.15" />
+                            <circle cx="220" cy="110" r="3" fill="#5c8d42" opacity="0.4" />
+                        </svg>
+                    </div>
+
+                </div>
             </div>
         </section>
 
 
         <!-- ================= WORKSPACE (EDITOR) VIEW ================= -->
         <section id="workspace-view" class="hidden flex-1 flex flex-col overflow-hidden bg-white w-full">
-            
-            <div class="h-14 border-b flex items-center px-6 justify-between bg-white shrink-0">
-                <div class="flex items-center gap-4 text-sm text-gray-500 italic">
+<div class="h-16 border-b border-gray-100 flex items-center px-8 justify-between bg-white shrink-0">
+                <div class="flex items-center gap-4 text-sm text-gray-400 font-light">
                     <span id="save-status">Tersimpan di riwayat</span>
                 </div>
-                <div class="flex gap-3">
-                    <button onclick="downloadHTMLFile()" class="flex items-center gap-2 px-4 py-1.5 bg-green-50 text-green-700 border border-green-300 rounded-md text-sm hover:bg-green-100 transition font-medium" title="Download File">
+                <div class="flex gap-2">
+                    <button onclick="downloadHTMLFile()" class="flex items-center gap-2 px-4 py-2 bg-transparent text-gray-600 hover:text-black hover:bg-gray-50 rounded-lg text-sm transition font-medium" title="Download File">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
                         Download
                     </button>
-<button onclick="copyToClipboard()" class="flex items-center gap-2 px-4 py-1.5 bg-gray-100 text-gray-700 border border-gray-300 rounded-md text-sm hover:bg-gray-200 transition font-medium">
-    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor"><path d="M8 3a1 1 0 011-1h2a1 1 0 110 2H9a1 1 0 01-1-1z" /><path d="M6 3a2 2 0 00-2 2v11a2 2 0 002 2h8a2 2 0 002-2V5a2 2 0 00-2-2 3 3 0 01-3 3H9a3 3 0 01-3-3z" /></svg>
-    Copy Kode
-</button>
-<button onclick="toggleInspector()" class="flex items-center gap-2 px-4 py-1.5 bg-purple-50 text-purple-700 border border-purple-300 rounded-md text-sm hover:bg-purple-100 transition font-medium" title="Visualisasikan Struktur HTML">
-    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" /></svg>
-    Inspector
-</button>
-<button onclick="splitSoC()" class="flex items-center gap-2 px-4 py-1.5 bg-blue-50 text-blue-700 border border-blue-300 rounded-md text-sm hover:bg-blue-100 transition font-medium" title="Split into HTML, JS, CSS">
-    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7" /></svg>
-    Split SoC
-</button>
-                    <button onclick="openPreview()" id="preview-toggle-btn" class="flex items-center gap-2 px-6 py-1.5 bg-[#5c8d42] text-white rounded-md text-sm hover:bg-[#4a7235] transition font-medium shadow-sm">
+                    <button onclick="copyToClipboard()" class="flex items-center gap-2 px-4 py-2 bg-transparent text-gray-600 hover:text-black hover:bg-gray-50 rounded-lg text-sm transition font-medium">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor"><path d="M8 3a1 1 0 011-1h2a1 1 0 110 2H9a1 1 0 01-1-1z" /><path d="M6 3a2 2 0 00-2 2v11a2 2 0 002 2h8a2 2 0 002-2V5a2 2 0 00-2-2 3 3 0 01-3 3H9a3 3 0 01-3-3z" /></svg>
+                        Salin Kode
+                    </button>
+                    <div class="w-px h-5 bg-gray-200 my-auto mx-1"></div>
+                    <button onclick="toggleInspector()" class="flex items-center gap-2 px-4 py-2 bg-transparent text-gray-600 hover:text-black hover:bg-gray-50 rounded-lg text-sm transition font-medium" title="Visualisasikan Struktur HTML">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 012-2h2a2 2 0 012 2" /></svg>
+                        Inspector
+                    </button>
+                    <button onclick="splitSoC()" class="flex items-center gap-2 px-4 py-2 bg-transparent text-gray-600 hover:text-black hover:bg-gray-50 rounded-lg text-sm transition font-medium" title="Split into HTML, JS, CSS">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7" /></svg>
+                        Split SoC
+                    </button>
+                    <button onclick="openPreview()" id="preview-toggle-btn" class="ml-2 flex items-center gap-2 px-5 py-2 bg-[#5c8d42] text-white rounded-lg text-sm hover:bg-[#4a7235] transition shadow-sm font-medium">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor"><path d="M10 12a2 2 0 100-4 2 2 0 000 4z" /><path fill-rule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clip-rule="evenodd" /></svg>
-                        Tampilkan Preview
+                        Preview
                     </button>
                 </div>
             </div>
@@ -201,19 +265,19 @@
                         
                         <div class="flex justify-between items-center mt-1">
                             <div class="flex flex-wrap gap-2 items-center">
-                                <button onclick="findExact()" class="px-4 py-1.5 bg-gray-200 hover:bg-gray-300 text-gray-800 rounded-md text-sm font-semibold transition shadow-sm border border-gray-300" title="Pencarian Cepat Sama Persis (Shortcut: Enter)">
+                                <button onclick="findExact()" class="px-4 py-1.5 bg-gray-100 hover:bg-gray-200 text-gray-800 rounded-md text-sm font-medium transition" title="Pencarian Cepat Sama Persis (Shortcut: Enter)">
                                     Find (Exact)
                                 </button>
                                 
-                                <button onclick="fuzzyFind()" class="px-4 py-1.5 bg-amber-100 hover:bg-amber-200 text-amber-800 border border-amber-300 rounded-md text-sm font-semibold transition shadow-sm flex items-center gap-1" title="Cari blok kode yang mirip (Abaikan Typo/Halusinasi AI)">
+                                <button onclick="fuzzyFind()" class="px-4 py-1.5 bg-transparent border border-gray-300 hover:border-black hover:text-black text-gray-600 rounded-md text-sm font-medium transition flex items-center gap-1" title="Cari blok kode yang mirip (Abaikan Typo/Halusinasi AI)">
                                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
-                                    ⚡ Fuzzy Find (AI)
+                                    Fuzzy Find
                                 </button>
                                 
-                                <div class="w-px h-6 bg-gray-300 mx-1"></div>
+                                <div class="w-px h-6 bg-gray-200 mx-1"></div>
                                 
-                                <button onclick="replaceAll()" class="px-4 py-1.5 bg-[#5c8d42] hover:bg-[#4a7235] text-white rounded-md text-sm font-semibold transition shadow-sm border border-[#4a7235]">Replace All</button>
-                                <button onclick="deleteFound()" class="px-4 py-1.5 bg-red-50 hover:bg-red-100 text-red-600 border border-red-200 rounded-md text-sm font-semibold transition">Find & Delete</button>
+                                <button onclick="replaceAll()" class="px-4 py-1.5 bg-[#5c8d42] hover:bg-[#4a7235] text-white rounded-md text-sm font-medium transition shadow-sm">Replace All</button>
+                                <button onclick="deleteFound()" class="px-4 py-1.5 bg-transparent border border-red-200 hover:bg-red-50 text-red-600 rounded-md text-sm font-medium transition">Find & Delete</button>
                             </div>
                             <div id="search-status" class="whitespace-nowrap text-xs text-gray-600 font-medium px-2 py-1 bg-gray-200 rounded">0 Hasil</div>
                         </div>
@@ -237,44 +301,37 @@
                 </aside>
             </div>
         </section>
-        
-        <!-- ================= FULL SCREEN PREVIEW PANEL ================= -->
+<!-- ================= FULL SCREEN PREVIEW PANEL ================= -->
         <div id="visual-preview-panel" class="fixed inset-0 z-[100] hidden bg-gray-100 flex flex-col">
-            <!-- Viewport Control Bar -->
-            <div class="h-14 bg-white border-b flex items-center justify-between px-6 shrink-0 shadow-sm">
-                <div class="flex items-center gap-2">
-                    <button onclick="closePreview()" class="p-2 hover:bg-gray-100 rounded-full transition text-gray-600">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" /></svg>
-                    </button>
-                    <span class="font-medium text-sm text-gray-700">Device Simulator</span>
-                </div>
+            
+            <!-- Floating Control Panel (Auto-hide) -->
+            <div class="absolute top-4 left-1/2 transform -translate-x-1/2 z-50 flex items-center gap-1 bg-gray-900/70 backdrop-blur-md px-2 py-1.5 rounded-full shadow-2xl opacity-10 hover:opacity-100 transition-opacity duration-300">
+                <button onclick="setViewport('mobile')" class="p-2 rounded-full text-gray-300 hover:bg-gray-700 hover:text-white transition" id="v-mobile" title="Mobile View">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z" /></svg>
+                </button>
+                <button onclick="setViewport('tablet')" class="p-2 rounded-full text-gray-300 hover:bg-gray-700 hover:text-white transition" id="v-tablet" title="Tablet View">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" /></svg>
+                </button>
+                <button onclick="setViewport('desktop')" class="p-2 rounded-full bg-gray-700 text-white transition" id="v-desktop" title="Desktop Full View">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 21h6l-.75-4M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
+                </button>
                 
-                <div class="flex bg-gray-100 p-1 rounded-lg gap-1">
-                    <button onclick="setViewport('mobile')" class="px-3 py-1.5 rounded-md text-xs font-bold transition flex items-center gap-2 hover:bg-white" id="v-mobile">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z" /></svg>
-                        Mobile
-                    </button>
-                    <button onclick="setViewport('tablet')" class="px-3 py-1.5 rounded-md text-xs font-bold transition flex items-center gap-2 hover:bg-white" id="v-tablet">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" /></svg>
-                        Tablet
-                    </button>
-                    <button onclick="setViewport('desktop')" class="px-3 py-1.5 bg-white shadow-sm rounded-md text-xs font-bold transition flex items-center gap-2" id="v-desktop">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 21h6l-.75-4M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
-                        Desktop
-                    </button>
-                </div>
-
-                <div class="w-10"></div> <!-- Spacer -->
+                <div class="w-px h-5 bg-gray-600 mx-1"></div>
+                
+                <button onclick="closePreview()" class="p-2 rounded-full text-red-400 hover:bg-red-500/20 hover:text-red-300 transition" title="Tutup Preview (ESC)">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+                </button>
             </div>
 
-            <div class="flex-1 overflow-auto p-8 flex justify-center items-start">
-                <div id="iframe-wrapper" class="preview-container w-full h-full bg-white rounded-md overflow-hidden ring-1 ring-gray-300">
-                    <iframe id="preview-iframe" class="w-full h-full border-none"></iframe>
+            <!-- Iframe Container Tanpa Padding Bawaan -->
+            <div id="iframe-outer-container" class="flex-1 w-full h-full flex justify-center items-start overflow-auto transition-all duration-300">
+                <div id="iframe-wrapper" class="preview-container w-full h-full bg-white overflow-hidden transition-all duration-300">
+                    <iframe id="preview-iframe" class="w-full h-full border-none" sandbox="allow-scripts allow-same-origin allow-forms allow-modals"></iframe>
                 </div>
             </div>
             
             <div id="esc-hint" class="fixed bottom-6 left-1/2 transform -translate-x-1/2 bg-gray-900/80 text-white px-6 py-2.5 rounded-full text-sm font-medium pointer-events-none transition-opacity duration-1000 z-10 shadow-xl flex items-center gap-2">
-                Tekan ESC untuk kembali ke Editor
+                Tekan ESC untuk kembali
             </div>
         </div>
 
@@ -502,25 +559,32 @@
                 if (cursor) {
                     const item = cursor.value;
                     resultsHTML += `
-                        <div class="group flex items-center justify-between p-4 mx-2 my-1 rounded-xl hover:bg-green-50 cursor-pointer border border-transparent hover:border-green-100 transition" onclick="openProject(${item.id})">
-                            <div class="flex items-center gap-4 overflow-hidden">
-                                <div class="p-2 bg-gray-100 rounded-lg group-hover:bg-green-200 text-gray-500 group-hover:text-green-800 transition">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
+                        <div class="group flex items-center justify-between p-3 rounded-lg hover:bg-green-50 cursor-pointer transition-colors" onclick="openProject(${item.id})">
+                            <div class="flex items-center gap-3 overflow-hidden">
+                                <div class="text-gray-400 group-hover:text-[#5c8d42] transition-colors shrink-0">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" /></svg>
                                 </div>
-                                <div class="flex flex-col overflow-hidden">
-                                    <span class="font-medium text-gray-800 truncate">${item.name}</span>
-                                    <span class="text-xs text-gray-400">Terakhir diedit: ${new Date(item.timestamp).toLocaleString('id-ID')}</span>
+                                <div class="flex flex-col overflow-hidden w-[170px]">
+                                    <span class="font-medium text-sm text-gray-800 group-hover:text-[#5c8d42] truncate transition-colors" title="${item.name}">${item.name}</span>
+                                    <span class="text-[11px] text-gray-400 truncate">${new Date(item.timestamp).toLocaleString('id-ID', {day: 'numeric', month:'short'})}</span>
                                 </div>
                             </div>
-                            <button onclick="deleteProject(event, ${item.id})" class="opacity-0 group-hover:opacity-100 p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-full transition">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                            <button onclick="deleteProject(event, ${item.id})" class="opacity-0 group-hover:opacity-100 p-1.5 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-md transition shrink-0" title="Hapus Riwayat">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
                             </button>
                         </div>
                     `;
                     count++;
                     cursor.continue();
                 } else {
-                    if (count === 0) UI.historyList.innerHTML = '<div class="p-10 text-center text-gray-400">Belum ada riwayat file yang disimpan.</div>';
+                    if (count === 0) UI.historyList.innerHTML = `
+                        <div class="flex flex-col items-center justify-center p-6 mt-10 text-center">
+                            <div class="p-4 bg-gray-100 rounded-full mb-3 text-gray-300">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 19a2 2 0 01-2-2V7a2 2 0 012-2h4l2 2h4a2 2 0 012 2v1M5 19h14a2 2 0 002-2v-5a2 2 0 00-2-2H9a2 2 0 00-2 2v5a2 2 0 01-2 2z" /></svg>
+                            </div>
+                            <p class="text-sm text-gray-600 font-medium">Belum ada proyek</p>
+                            <p class="text-xs text-gray-400 mt-1">Buat atau buka file baru untuk memulai</p>
+                        </div>`;
                     else UI.historyList.innerHTML = resultsHTML;
                 }
             };
@@ -725,16 +789,42 @@
             UI.previewPanel.classList.add('hidden');
             if(cmEditor) cmEditor.focus();
         };
-
-        const setViewport = (device) => {
+const setViewport = (device) => {
             const wrapper = document.getElementById('iframe-wrapper');
+            const outerContainer = document.getElementById('iframe-outer-container');
             const btns = ['v-mobile', 'v-tablet', 'v-desktop'];
-            btns.forEach(id => document.getElementById(id).classList.remove('bg-white', 'shadow-sm'));
-            document.getElementById('v-' + device).classList.add('bg-white', 'shadow-sm');
-
-            if(device === 'mobile') { wrapper.style.width = '375px'; wrapper.style.height = '667px'; }
-            else if(device === 'tablet') { wrapper.style.width = '768px'; wrapper.style.height = '1024px'; }
-            else { wrapper.style.width = '100%'; wrapper.style.height = '100%'; }
+            
+            // Reset style semua tombol di Floating Panel
+            btns.forEach(id => {
+                const btn = document.getElementById(id);
+                btn.classList.remove('bg-gray-700', 'text-white');
+                btn.classList.add('text-gray-300');
+            });
+            
+            // Aktifkan tombol yang dipilih
+            const activeBtn = document.getElementById('v-' + device);
+            activeBtn.classList.remove('text-gray-300');
+            activeBtn.classList.add('bg-gray-700', 'text-white');
+if(device === 'mobile') { 
+                // Dimensi iPhone 14/15/16 (390px x 844px)
+                wrapper.style.width = '390px'; wrapper.style.height = '844px'; 
+                // Bezel tebal (ring-[14px]) dan sudut sangat melengkung (rounded-[3rem]) khas fisik iPhone
+                wrapper.className = 'preview-container bg-white overflow-hidden transition-all duration-300 rounded-[3rem] ring-[14px] ring-gray-900 shadow-2xl mt-8 mb-8 relative';
+                outerContainer.classList.add('p-8');
+            }
+            else if(device === 'tablet') { 
+                // Dimensi iPad Air / iPad Pro 11" (820px x 1180px)
+                wrapper.style.width = '820px'; wrapper.style.height = '1180px'; 
+                // Bezel proporsional (ring-[16px]) dan sudut melengkung (rounded-[2rem]) khas iPad
+                wrapper.className = 'preview-container bg-white overflow-hidden transition-all duration-300 rounded-[2rem] ring-[16px] ring-gray-900 shadow-2xl mt-8 mb-12 relative';
+                outerContainer.classList.add('p-8');
+            }
+            else { 
+                // Desktop: Benar-benar Full Screen, hapus semua pembatas
+                wrapper.style.width = '100%'; wrapper.style.height = '100%'; 
+                wrapper.className = 'preview-container w-full h-full bg-white overflow-hidden transition-all duration-300';
+                outerContainer.classList.remove('p-8');
+            }
         };
 
         const toggleInspector = () => {
@@ -796,8 +886,11 @@
                     }
                 };
 
-                container.innerHTML = '';
-                container.appendChild(fragment);
+                // Optimasi performa: Mencegah UI freeze dengan menyerahkan render ke antrean Frame Browser
+                requestAnimationFrame(() => {
+                    container.innerHTML = '';
+                    container.appendChild(fragment);
+                });
             } catch (e) {
                 container.innerHTML = '<div class="text-red-400 text-xs p-2">Parsing Error...</div>';
             }
@@ -821,8 +914,8 @@
                     });
                 <\/script>
             `;
-            const blob = new Blob([content + injectedScript], { type: 'text/html' });
-            UI.previewIframe.src = URL.createObjectURL(blob);
+            // Menggunakan srcdoc lebih aman (isolasi origin) dan mencegah memory leak dari object URL
+            UI.previewIframe.srcdoc = content + injectedScript;
         };
 
         document.addEventListener('keydown', (e) => {
@@ -1061,10 +1154,29 @@
             showToast("Kode berhasil disalin!");
         };
 
+        let toastQueue = [];
+        let isToastActive = false;
+
         const showToast = (msg) => {
-            UI.toast.innerText = msg;
+            toastQueue.push(msg);
+            if (!isToastActive) processToastQueue();
+        };
+
+        const processToastQueue = () => {
+            if (toastQueue.length === 0) {
+                isToastActive = false;
+                UI.toast.style.opacity = '0';
+                return;
+            }
+            isToastActive = true;
+            UI.toast.innerText = toastQueue.shift();
             UI.toast.style.opacity = '1';
-            setTimeout(() => { UI.toast.style.opacity = '0'; }, 3000);
+            
+            setTimeout(() => { 
+                UI.toast.style.opacity = '0'; 
+                // Beri jeda sedikit untuk transisi fade-out sebelum menampilkan pesan antrean berikutnya
+                setTimeout(processToastQueue, 350); 
+            }, 3000);
         };
 
         // --- Fitur SoC (Separation of Concerns) ---

@@ -42,6 +42,24 @@
         ::-webkit-scrollbar-thumb { background: #c1c1c1; border-radius: 4px; }
         ::-webkit-scrollbar-thumb:hover { background: #a8a8a8; }
         
+        /* Device Simulator & Inspector Styles */
+        .preview-container {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            margin: 0 auto;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+        .inspector-panel {
+            width: 0;
+            transition: width 0.3s ease;
+            border-left: 1px solid #e5e7eb;
+            background: #fdfdfd;
+        }
+        .inspector-active .inspector-panel { width: 280px; }
+        .dom-node { cursor: pointer; padding: 2px 8px; border-radius: 4px; font-size: 12px; }
+        .dom-node:hover { background: #f0fdf4; color: #166534; }
+        .dom-node-tag { color: #22c55e; font-weight: 600; }
+        .dom-node-attr { color: #92400e; font-size: 10px; }
+
         /* Smooth transitions */
         .fade-enter { opacity: 0; transform: translateY(10px); }
         .fade-enter-active { opacity: 1; transform: translateY(0); transition: opacity 300ms, transform 300ms; }
@@ -146,10 +164,18 @@
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
                         Download
                     </button>
-                    <button onclick="copyToClipboard()" class="flex items-center gap-2 px-4 py-1.5 bg-gray-100 text-gray-700 border border-gray-300 rounded-md text-sm hover:bg-gray-200 transition font-medium">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor"><path d="M8 3a1 1 0 011-1h2a1 1 0 110 2H9a1 1 0 01-1-1z" /><path d="M6 3a2 2 0 00-2 2v11a2 2 0 002 2h8a2 2 0 002-2V5a2 2 0 00-2-2 3 3 0 01-3 3H9a3 3 0 01-3-3z" /></svg>
-                        Copy Kode
-                    </button>
+<button onclick="copyToClipboard()" class="flex items-center gap-2 px-4 py-1.5 bg-gray-100 text-gray-700 border border-gray-300 rounded-md text-sm hover:bg-gray-200 transition font-medium">
+    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor"><path d="M8 3a1 1 0 011-1h2a1 1 0 110 2H9a1 1 0 01-1-1z" /><path d="M6 3a2 2 0 00-2 2v11a2 2 0 002 2h8a2 2 0 002-2V5a2 2 0 00-2-2 3 3 0 01-3 3H9a3 3 0 01-3-3z" /></svg>
+    Copy Kode
+</button>
+<button onclick="toggleInspector()" class="flex items-center gap-2 px-4 py-1.5 bg-purple-50 text-purple-700 border border-purple-300 rounded-md text-sm hover:bg-purple-100 transition font-medium" title="Visualisasikan Struktur HTML">
+    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" /></svg>
+    Inspector
+</button>
+<button onclick="splitSoC()" class="flex items-center gap-2 px-4 py-1.5 bg-blue-50 text-blue-700 border border-blue-300 rounded-md text-sm hover:bg-blue-100 transition font-medium" title="Split into HTML, JS, CSS">
+    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7" /></svg>
+    Split SoC
+</button>
                     <button onclick="openPreview()" id="preview-toggle-btn" class="flex items-center gap-2 px-6 py-1.5 bg-[#5c8d42] text-white rounded-md text-sm hover:bg-[#4a7235] transition font-medium shadow-sm">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor"><path d="M10 12a2 2 0 100-4 2 2 0 000 4z" /><path fill-rule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clip-rule="evenodd" /></svg>
                         Tampilkan Preview
@@ -158,9 +184,9 @@
             </div>
 
             <!-- Content Area -->
-            <div class="flex-1 relative overflow-hidden flex flex-col bg-[#fcfcfc]">
+            <div id="workspace-container" class="flex-1 relative overflow-hidden flex bg-[#fcfcfc]">
                 
-                <div id="code-container" class="absolute inset-0 flex flex-col z-10 bg-white">
+                <div id="code-container" class="flex-1 flex flex-col z-10 bg-white border-r">
                     <!-- Search & Replace Tools -->
                     <div class="p-3 bg-gray-50 border-b flex flex-col gap-2 shrink-0 shadow-sm">
                         <div class="flex flex-col md:flex-row gap-3">
@@ -196,16 +222,60 @@
                     <!-- The actual textarea -->
                     <textarea id="main-editor" class="flex-1 w-full p-6 outline-none resize-none code-font text-[15px] leading-relaxed whitespace-pre" spellcheck="false"></textarea>
                 </div>
+
+                <!-- DOM Inspector Side Panel -->
+                <aside class="inspector-panel flex flex-col overflow-hidden">
+                    <div class="p-3 bg-gray-50 border-b flex justify-between items-center shrink-0">
+                        <span class="text-xs font-bold uppercase tracking-wider text-gray-500">DOM Tree Inspector</span>
+                        <button onclick="toggleInspector()" class="text-gray-400 hover:text-gray-600">
+                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg>
+                        </button>
+                    </div>
+                    <div id="dom-tree-content" class="flex-1 overflow-auto p-4 code-font text-sm">
+                        <div class="text-gray-400 italic text-xs">Menunggu kode...</div>
+                    </div>
+                </aside>
             </div>
         </section>
         
         <!-- ================= FULL SCREEN PREVIEW PANEL ================= -->
-        <div id="visual-preview-panel" class="fixed inset-0 z-[100] hidden bg-white">
-            <div id="esc-hint" class="absolute top-6 left-1/2 transform -translate-x-1/2 bg-gray-900/80 text-white px-6 py-2.5 rounded-full text-sm font-medium pointer-events-none transition-opacity duration-1000 z-10 shadow-xl flex items-center gap-2">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" /></svg>
+        <div id="visual-preview-panel" class="fixed inset-0 z-[100] hidden bg-gray-100 flex flex-col">
+            <!-- Viewport Control Bar -->
+            <div class="h-14 bg-white border-b flex items-center justify-between px-6 shrink-0 shadow-sm">
+                <div class="flex items-center gap-2">
+                    <button onclick="closePreview()" class="p-2 hover:bg-gray-100 rounded-full transition text-gray-600">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" /></svg>
+                    </button>
+                    <span class="font-medium text-sm text-gray-700">Device Simulator</span>
+                </div>
+                
+                <div class="flex bg-gray-100 p-1 rounded-lg gap-1">
+                    <button onclick="setViewport('mobile')" class="px-3 py-1.5 rounded-md text-xs font-bold transition flex items-center gap-2 hover:bg-white" id="v-mobile">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z" /></svg>
+                        Mobile
+                    </button>
+                    <button onclick="setViewport('tablet')" class="px-3 py-1.5 rounded-md text-xs font-bold transition flex items-center gap-2 hover:bg-white" id="v-tablet">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" /></svg>
+                        Tablet
+                    </button>
+                    <button onclick="setViewport('desktop')" class="px-3 py-1.5 bg-white shadow-sm rounded-md text-xs font-bold transition flex items-center gap-2" id="v-desktop">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 21h6l-.75-4M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
+                        Desktop
+                    </button>
+                </div>
+
+                <div class="w-10"></div> <!-- Spacer -->
+            </div>
+
+            <div class="flex-1 overflow-auto p-8 flex justify-center items-start">
+                <div id="iframe-wrapper" class="preview-container w-full h-full bg-white rounded-md overflow-hidden ring-1 ring-gray-300">
+                    <iframe id="preview-iframe" class="w-full h-full border-none"></iframe>
+                </div>
+            </div>
+            
+            <div id="esc-hint" class="fixed bottom-6 left-1/2 transform -translate-x-1/2 bg-gray-900/80 text-white px-6 py-2.5 rounded-full text-sm font-medium pointer-events-none transition-opacity duration-1000 z-10 shadow-xl flex items-center gap-2">
                 Tekan ESC untuk kembali ke Editor
             </div>
-            <iframe id="preview-iframe" class="w-full h-full border-none bg-white"></iframe>
         </div>
 
     </main>
@@ -246,7 +316,17 @@
         let isPreviewMode = false;
         let autoSaveTimeout = null;
         let cmEditor = null; 
+        let isInspectorOpen = false;
         
+        // --- Utility: High-Performance Debounce ---
+        const debounce = (fn, delay) => {
+            let timeout;
+            return (...args) => {
+                clearTimeout(timeout);
+                timeout = setTimeout(() => fn.apply(this, args), delay);
+            };
+        };
+
         // --- State Management Pencarian ---
         let activeSearchMode = 'exact'; // 'exact' atau 'fuzzy'
         
@@ -540,7 +620,7 @@
                     mode: "htmlmixed",
                     lineNumbers: true,
                     lineWrapping: true,
-                    viewportMargin: Infinity,
+                    viewportMargin: 20, // Optimasi render hanya yang terlihat di layar
                     extraKeys: {
                         "Ctrl-F": function(cm) {
                             const selectedText = cm.getSelection();
@@ -584,12 +664,16 @@
                     }
                 });
 
+                // Gabungkan update DOM dan Auto-save dalam satu siklus efisien
+                const heavyTasks = debounce(() => {
+                    const content = cmEditor.getValue();
+                    if(isInspectorOpen) updateDOMTree(content);
+                    if(currentFileId) updateExistingProject(currentFileId, content);
+                }, 500);
+
                 cmEditor.on('change', () => {
-                    UI.saveStatus.innerText = "Menyimpan...";
-                    clearTimeout(autoSaveTimeout);
-                    autoSaveTimeout = setTimeout(() => {
-                        if(currentFileId) updateExistingProject(currentFileId, cmEditor.getValue());
-                    }, 800); 
+                    UI.saveStatus.innerText = "Menunggu jeda ketik...";
+                    heavyTasks();
                 });
             }
 
@@ -640,6 +724,92 @@
             isPreviewMode = false;
             UI.previewPanel.classList.add('hidden');
             if(cmEditor) cmEditor.focus();
+        };
+
+        const setViewport = (device) => {
+            const wrapper = document.getElementById('iframe-wrapper');
+            const btns = ['v-mobile', 'v-tablet', 'v-desktop'];
+            btns.forEach(id => document.getElementById(id).classList.remove('bg-white', 'shadow-sm'));
+            document.getElementById('v-' + device).classList.add('bg-white', 'shadow-sm');
+
+            if(device === 'mobile') { wrapper.style.width = '375px'; wrapper.style.height = '667px'; }
+            else if(device === 'tablet') { wrapper.style.width = '768px'; wrapper.style.height = '1024px'; }
+            else { wrapper.style.width = '100%'; wrapper.style.height = '100%'; }
+        };
+
+        const toggleInspector = () => {
+            isInspectorOpen = !isInspectorOpen;
+            if(isInspectorOpen) {
+                document.getElementById('workspace-container').classList.add('inspector-active');
+                updateDOMTree();
+            } else {
+                document.getElementById('workspace-container').classList.remove('inspector-active');
+            }
+            setTimeout(() => cmEditor.refresh(), 350);
+        };
+
+        const updateDOMTree = (content) => {
+            const container = document.getElementById('dom-tree-content');
+            const fragment = document.createDocumentFragment(); // Gunakan Fragment untuk cegah reflow massal
+            
+            try {
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(content || cmEditor.getValue(), 'text/html');
+                
+                const renderNode = (node, depth = 0) => {
+                    if (node.nodeType !== 1) return;
+                    
+                    const el = document.createElement('div');
+                    el.className = 'dom-node hover:bg-green-50 transition-colors duration-75 border-l border-transparent hover:border-green-300';
+                    el.style.paddingLeft = (depth * 12 + 8) + 'px';
+                    
+                    // Optimasi pembuatan String atribut
+                    let attrText = "";
+                    for (let i = 0; i < node.attributes.length; i++) {
+                        const attr = node.attributes[i];
+                        attrText += ` <span class="dom-node-attr">${attr.name}</span>`;
+                    }
+                    
+                    el.innerHTML = `<span class="dom-node-tag">${node.tagName.toLowerCase()}</span>${attrText}`;
+                    
+                    // Simpan meta-data untuk pencarian cepat di Editor
+                    el.dataset.tag = node.tagName.toLowerCase();
+                    el.dataset.snippet = node.outerHTML.slice(0, 30);
+                    
+                    fragment.appendChild(el);
+                    
+                    // Batasi kedalaman render jika terlalu ekstrem (opsional untuk stabilitas)
+                    if (depth < 50) {
+                        for (let i = 0; i < node.children.length; i++) {
+                            renderNode(node.children[i], depth + 1);
+                        }
+                    }
+                };
+
+                renderNode(doc.body || doc.documentElement);
+                
+                // Event Delegation: Satu listener untuk semua node (Sangat Hemat Memori)
+                container.onclick = (e) => {
+                    const target = e.target.closest('.dom-node');
+                    if (target && target.dataset.tag) {
+                        highlightInEditor(target.dataset.tag, target.dataset.snippet);
+                    }
+                };
+
+                container.innerHTML = '';
+                container.appendChild(fragment);
+            } catch (e) {
+                container.innerHTML = '<div class="text-red-400 text-xs p-2">Parsing Error...</div>';
+            }
+        };
+
+        const highlightInEditor = (tag, snippet) => {
+            const cursor = cmEditor.getSearchCursor(tag);
+            if (cursor.findNext()) {
+                cmEditor.setSelection(cursor.from(), cursor.to());
+                cmEditor.scrollIntoView({from: cursor.from(), to: cursor.to()}, 150);
+                cmEditor.focus();
+            }
         };
 
         const refreshPreview = () => {
@@ -895,6 +1065,62 @@
             UI.toast.innerText = msg;
             UI.toast.style.opacity = '1';
             setTimeout(() => { UI.toast.style.opacity = '0'; }, 3000);
+        };
+
+        // --- Fitur SoC (Separation of Concerns) ---
+        const splitSoC = () => {
+            if (!cmEditor) return;
+            const fullCode = cmEditor.getValue();
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(fullCode, 'text/html');
+
+            // 1. Ekstrak CSS
+            let cssContent = "";
+            const styles = doc.querySelectorAll('style');
+            styles.forEach(s => {
+                cssContent += s.textContent + "\n";
+                s.remove();
+            });
+
+            // 2. Ekstrak JS
+            let jsContent = "";
+            const scripts = doc.querySelectorAll('script:not([src])'); // Hanya internal script
+            scripts.forEach(s => {
+                jsContent += s.textContent + "\n";
+                s.remove();
+            });
+
+            // 3. Bersihkan HTML dan tambahkan Link ke file eksternal
+            if (cssContent.trim()) {
+                const link = doc.createElement('link');
+                link.rel = 'stylesheet';
+                link.href = 'style.css';
+                doc.head.appendChild(link);
+            }
+            if (jsContent.trim()) {
+                const script = doc.createElement('script');
+                script.src = 'script.js';
+                doc.body.appendChild(script);
+            }
+
+            const htmlContent = "<!DOCTYPE html>\n" + doc.documentElement.outerHTML;
+
+            // Trigger Download File (Simulasi Bundle dengan download beruntun)
+            // Idealnya menggunakan library JSZip, tapi ini versi native sederhana:
+            downloadBlob(htmlContent, 'index.html');
+            if (cssContent.trim()) setTimeout(() => downloadBlob(cssContent, 'style.css'), 200);
+            if (jsContent.trim()) setTimeout(() => downloadBlob(jsContent, 'script.js'), 400);
+            
+            showToast("Berhasil memecah SoC menjadi 3 file!");
+        };
+
+        const downloadBlob = (content, fileName) => {
+            const blob = new Blob([content], { type: 'text/plain' });
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = fileName;
+            a.click();
+            URL.revokeObjectURL(a.href);
         };
 
         // Initialize App

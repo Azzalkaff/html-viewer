@@ -1,0 +1,1453 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HTML Viewer Pro</title>
+
+<!-- CodeMirror 5 -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/theme/monokai.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/theme/dracula.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/theme/material-darker.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/fold/foldgutter.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/xml/xml.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/javascript/javascript.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/css/css.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/htmlmixed/htmlmixed.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/edit/matchbrackets.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/edit/closetag.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/fold/foldcode.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/fold/foldgutter.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/fold/xml-fold.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/fold/brace-fold.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/search/searchcursor.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/selection/active-line.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/edit/closebrackets.min.js"></script>
+<!-- jsDiff -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jsdiff/5.1.0/diff.min.js"></script>
+<!-- JetBrains Mono font -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0a0b0e;
+  --surface:#111318;
+  --surface2:#181c24;
+  --surface3:#1f2433;
+  --border:#252b3b;
+  --border2:#2e3650;
+  --accent:#5865f2;
+  --accent2:#7c86f7;
+  --accent-dim:#5865f215;
+  --text:#dde3f0;
+  --text2:#8b96b0;
+  --text3:#4a5568;
+  --ok:#22d3a0;
+  --warn:#f59e0b;
+  --err:#f04747;
+  --info:#38bdf8;
+  --r:5px;
+  --font-mono:'JetBrains Mono',monospace;
+  --font-ui:'IBM Plex Sans','Segoe UI',sans-serif;
+}
+body{font-family:var(--font-ui);background:var(--bg);color:var(--text);height:100vh;overflow:hidden;display:flex;flex-direction:column}
+
+/* ── TOPBAR ─────────────────────────────────────────── */
+#topbar{height:46px;background:var(--surface);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 14px;gap:6px;flex-shrink:0;user-select:none}
+.logo{font-size:14px;font-weight:700;color:var(--accent2);display:flex;align-items:center;gap:7px;letter-spacing:-.3px;margin-right:6px}
+.logo svg{width:18px;height:18px}
+.tdiv{width:1px;height:22px;background:var(--border2);margin:0 4px}
+.btn{height:30px;padding:0 11px;border:1px solid var(--border2);background:var(--surface2);color:var(--text);border-radius:var(--r);font-size:12px;font-family:var(--font-ui);cursor:pointer;display:flex;align-items:center;gap:5px;transition:all .13s;white-space:nowrap;font-weight:500}
+.btn:hover{background:var(--surface3);border-color:var(--accent);color:var(--accent2)}
+.btn.pri{background:var(--accent);border-color:var(--accent);color:#fff}
+.btn.pri:hover{background:var(--accent2);border-color:var(--accent2)}
+.btn.warn{background:#f59e0b18;border-color:var(--warn);color:var(--warn)}
+.btn.warn:hover{background:#f59e0b30}
+.btn.dang{background:#f0474718;border-color:var(--err);color:var(--err)}
+.btn.dang:hover{background:#f0474730}
+.btn.ico{width:30px;padding:0;justify-content:center}
+.tsp{flex:1}
+
+/* ── MAIN ───────────────────────────────────────────── */
+#main{flex:1;display:flex;overflow:hidden;position:relative}
+
+/* ── EDITOR PANEL ────────────────────────────────────── */
+#ep{width:50%;display:flex;flex-direction:column;overflow:hidden;flex-shrink:0;min-width:200px}
+#eh{height:30px;background:var(--surface2);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 10px;gap:8px;font-size:11px;color:var(--text2);flex-shrink:0}
+#ec{flex:1;overflow:hidden;position:relative;min-height:0}
+.CodeMirror{height:100%!important;font-family:var(--font-mono)!important;font-size:13px;background:#1a1b23!important}
+.CodeMirror-scroll{height:100%}
+.cm-s-monokai.CodeMirror{background:#1a1b23}
+.s-hi{background:rgba(255,200,40,.28);border-radius:2px}
+.s-hi-a{background:rgba(255,140,0,.75)!important;border-radius:2px;outline:1px solid #ff9d00}
+
+/* ── RESIZE ─────────────────────────────────────────── */
+#rh{width:5px;background:var(--border);cursor:col-resize;flex-shrink:0;transition:background .13s;z-index:10}
+#rh:hover,#rh.act{background:var(--accent)}
+#rh::after{content:'';position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:3px;height:28px;background:rgba(255,255,255,.08);border-radius:2px}
+#rh{position:relative}
+
+/* ── PREVIEW PANEL ───────────────────────────────────── */
+#pp{flex:1;display:flex;flex-direction:column;overflow:hidden;background:#fff;min-width:200px}
+#ph{height:30px;background:var(--surface2);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 10px;gap:8px;font-size:11px;color:var(--text2);flex-shrink:0}
+#pf{flex:1;border:none;width:100%;background:#fff}
+.plbl{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--text3)}
+#upd-ind{font-size:10px;color:var(--ok);opacity:0;transition:opacity .6s}
+
+/* ── FIND BAR ────────────────────────────────────────── */
+#fb{height:44px;background:var(--surface2);border-top:1px solid var(--border);display:flex;align-items:center;padding:0 12px;gap:6px;flex-shrink:0;overflow:hidden;transition:height .18s,opacity .18s}
+#fb.hid{height:0;opacity:0;padding:0;border:none}
+.fi{height:26px;padding:0 9px;background:var(--surface3);border:1px solid var(--border2);color:var(--text);border-radius:var(--r);font-size:12px;font-family:var(--font-ui);outline:none;transition:border-color .13s}
+.fi:focus{border-color:var(--accent)}
+.fi.nf{border-color:var(--err);background:#f0474710}
+#fi{width:190px}
+#ri{width:165px}
+.fc{font-size:11px;color:var(--text2);min-width:64px;text-align:center;font-variant-numeric:tabular-nums}
+.fsep{width:1px;height:18px;background:var(--border2)}
+.fcb{display:flex;align-items:center;gap:3px;font-size:11px;color:var(--text2);cursor:pointer;padding:2px 4px;border-radius:3px;transition:background .1s}
+.fcb:hover{background:var(--surface3)}
+.fcb input{margin:0;cursor:pointer}
+
+/* ── STATUSBAR ───────────────────────────────────────── */
+#sb{height:22px;background:var(--surface);border-top:1px solid var(--border);display:flex;align-items:center;padding:0 14px;gap:14px;font-size:10px;color:var(--text2);flex-shrink:0}
+.si{display:flex;align-items:center;gap:4px}
+.dot{width:6px;height:6px;border-radius:50%;background:var(--text3);transition:background .3s}
+.dot.on{background:var(--ok);animation:pulse 2s infinite}
+.dot.changed{background:var(--warn)}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+.sp2{flex:1}
+kbd{padding:1px 4px;background:var(--surface3);border:1px solid var(--border2);border-radius:3px;font-family:var(--font-mono);font-size:9px;color:var(--text2)}
+
+/* ── HISTORY PANEL ───────────────────────────────────── */
+#hp{position:fixed;top:46px;right:0;width:300px;height:calc(100vh - 46px);background:var(--surface);border-left:1px solid var(--border);display:flex;flex-direction:column;z-index:100;transform:translateX(100%);transition:transform .22s cubic-bezier(.4,0,.2,1)}
+#hp.open{transform:none}
+.ph2{height:44px;padding:0 14px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);font-size:13px;font-weight:600}
+.psr{padding:8px 10px;border-bottom:1px solid var(--border)}
+.psr input{width:100%;height:26px;padding:0 8px;background:var(--surface2);border:1px solid var(--border);color:var(--text);border-radius:var(--r);font-size:12px;outline:none}
+.psr input:focus{border-color:var(--accent)}
+#hl{flex:1;overflow-y:auto;padding:6px}
+.hi{padding:9px 10px;border-radius:var(--r);cursor:pointer;margin-bottom:3px;border:1px solid transparent;transition:all .13s;position:relative}
+.hi:hover{background:var(--surface2);border-color:var(--border)}
+.hi.act{background:var(--accent-dim);border-color:var(--accent)}
+.hi-name{font-size:12px;font-weight:500;display:flex;align-items:center;gap:6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hi-meta{font-size:10px;color:var(--text2);margin-top:3px;display:flex;gap:8px}
+.hi-acts{display:flex;gap:3px;margin-top:5px;opacity:0;transition:opacity .13s;flex-wrap:wrap}
+.hi:hover .hi-acts{opacity:1}
+.hi-btn{height:18px;padding:0 7px;background:var(--surface3);border:1px solid var(--border);color:var(--text2);border-radius:3px;font-size:10px;cursor:pointer;transition:all .1s;font-family:var(--font-ui)}
+.hi-btn:hover{background:var(--accent-dim);color:var(--accent2);border-color:var(--accent)}
+.hi-btn.d:hover{background:#f0474720;color:var(--err);border-color:var(--err)}
+
+/* ── MODALS ──────────────────────────────────────────── */
+.ov{position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:200;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(6px)}
+.ov.hid{display:none}
+.modal{background:var(--surface);border:1px solid var(--border2);border-radius:10px;width:92%;max-width:680px;max-height:82vh;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.7)}
+.modal.wide{max-width:860px}
+.modal.tall{max-height:90vh}
+.mh{padding:15px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;font-size:13px;font-weight:600}
+.mb{flex:1;overflow:auto;padding:16px 20px}
+.mf{padding:11px 20px;border-top:1px solid var(--border);display:flex;justify-content:flex-end;gap:8px}
+#pta{width:100%;height:380px;background:#1a1b23;color:#f8f8f2;border:1px solid var(--border);border-radius:var(--r);font-family:var(--font-mono);font-size:12.5px;padding:12px;resize:none;outline:none;line-height:1.55}
+#pta:focus{border-color:var(--accent)}
+
+/* ── DIFF ────────────────────────────────────────────── */
+.dsr{display:flex;gap:10px;align-items:flex-end;margin-bottom:14px}
+.dsc{flex:1;display:flex;flex-direction:column;gap:5px;font-size:11px;color:var(--text2)}
+.dsc select{height:28px;background:var(--surface2);border:1px solid var(--border);color:var(--text);border-radius:var(--r);padding:0 8px;font-size:12px;outline:none}
+.dsc select:focus{border-color:var(--accent)}
+.dleg{display:flex;gap:12px;font-size:10px;color:var(--text2);margin-bottom:8px}
+.dleg-i{display:flex;align-items:center;gap:4px}
+.dleg-c{width:10px;height:10px;border-radius:2px}
+.dstats{font-size:11px;color:var(--text2);display:flex;gap:14px;padding:6px 0 10px}
+.dv{font-family:var(--font-mono);font-size:11.5px;line-height:1.6;background:#12131a;border:1px solid var(--border);border-radius:var(--r);overflow:auto;max-height:52vh}
+.dl{display:flex;padding:0 10px}
+.dl.add{background:rgba(34,211,160,.1)}
+.dl.rem{background:rgba(240,71,71,.1)}
+.dl.unc{color:var(--text3)}
+.dl-num{min-width:42px;text-align:right;padding-right:10px;border-right:1px solid var(--border);margin-right:10px;color:var(--text3);flex-shrink:0;font-size:10.5px;padding-top:1px}
+.dl-pfx{min-width:14px;flex-shrink:0}
+.dl.add .dl-pfx{color:var(--ok)}
+.dl.rem .dl-pfx{color:var(--err)}
+.dl-cnt{flex:1;white-space:pre;overflow:hidden;text-overflow:ellipsis}
+
+/* ── SETTINGS ────────────────────────────────────────── */
+.sg{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.sf{display:flex;flex-direction:column;gap:5px}
+.sf label{font-size:11px;color:var(--text2);font-weight:500}
+.sf select,.sf input[type=range]{height:28px;background:var(--surface2);border:1px solid var(--border);color:var(--text);border-radius:var(--r);padding:0 8px;font-size:12px;outline:none}
+.sf select:focus{border-color:var(--accent)}
+.sfr{display:flex;align-items:center;gap:8px}
+.sfr input[type=range]{height:auto;padding:0;flex:1}
+.sfr span{font-size:11px;color:var(--text2);min-width:32px}
+.skbd{display:grid;grid-template-columns:1fr 1fr;gap:6px;font-size:11px;color:var(--text2);margin-top:12px;padding-top:14px;border-top:1px solid var(--border)}
+
+/* ── DROP ZONE ───────────────────────────────────────── */
+#dz{position:fixed;inset:0;background:rgba(88,101,242,.1);border:3px dashed var(--accent);z-index:500;display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:700;color:var(--accent2);pointer-events:none;opacity:0;transition:opacity .18s}
+#dz.vis{opacity:1}
+
+/* ── EMPTY STATE ─────────────────────────────────────── */
+#es{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;color:var(--text2);background:#1a1b23;z-index:5}
+#es.hid{display:none}
+#es svg{opacity:.2}
+#es h3{font-size:15px;color:var(--text);opacity:.6}
+#es p{font-size:11.5px;max-width:260px;text-align:center;line-height:1.65;opacity:.7}
+
+/* ── WATCH BADGE ─────────────────────────────────────── */
+.wb{display:inline-flex;align-items:center;gap:4px;padding:2px 7px;border-radius:3px;font-size:10px;font-weight:600;letter-spacing:.2px}
+.wb.on{background:#22d3a020;color:var(--ok)}
+.wb.off{background:var(--surface3);color:var(--text3)}
+
+/* ── CONTEXT MENU ────────────────────────────────────── */
+.cm2{position:fixed;background:var(--surface2);border:1px solid var(--border2);border-radius:var(--r);padding:4px;z-index:300;min-width:168px;box-shadow:0 10px 40px rgba(0,0,0,.6)}
+.cm2-i{padding:7px 12px;font-size:12px;border-radius:4px;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:10px;color:var(--text)}
+.cm2-i:hover{background:var(--surface3)}
+.cm2-i.dang:hover{background:#f0474720;color:var(--err)}
+.cm2-sep{height:1px;background:var(--border);margin:4px 0}
+.cm2-sc{font-size:10px;color:var(--text3)}
+
+/* ── TOAST ───────────────────────────────────────────── */
+#tc{position:fixed;bottom:32px;right:14px;z-index:1000;display:flex;flex-direction:column;gap:7px;pointer-events:none}
+.toast{padding:9px 14px;background:var(--surface);border:1px solid var(--border2);border-radius:var(--r);font-size:11.5px;max-width:280px;display:flex;align-items:center;gap:8px;box-shadow:0 6px 24px rgba(0,0,0,.5);animation:tin .22s ease}
+.toast.info{border-left:3px solid var(--info)}
+.toast.ok{border-left:3px solid var(--ok)}
+.toast.warn{border-left:3px solid var(--warn)}
+.toast.err{border-left:3px solid var(--err)}
+@keyframes tin{from{transform:translateX(16px);opacity:0}to{transform:none;opacity:1}}
+
+/* ── SCROLLBAR ───────────────────────────────────────── */
+::-webkit-scrollbar{width:6px;height:6px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px}
+::-webkit-scrollbar-thumb:hover{background:var(--accent)}
+</style>
+</head>
+<body>
+
+<div id="dz">⬇ Drop HTML File</div>
+
+<!-- TOPBAR -->
+<div id="topbar">
+  <div class="logo">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+      <polyline points="14 2 14 8 20 8"/>
+      <line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/>
+      <polyline points="10 9 9 9 8 9"/>
+    </svg>
+    HTML Viewer
+  </div>
+  <div class="tdiv"></div>
+  <button class="btn pri" id="bOpen" title="Ctrl+O">
+    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+    Open File
+  </button>
+  <button class="btn" id="bPaste" title="Ctrl+Shift+V">
+    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/></svg>
+    Paste HTML
+  </button>
+  <div class="tdiv"></div>
+  <button class="btn" id="bHistory" title="Ctrl+H — File history">
+    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+    History
+  </button>
+  <button class="btn" id="bDiff" title="Diff viewer">
+    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+    Diff
+  </button>
+  <div class="tdiv"></div>
+  <button class="btn" id="bCopy" title="Ctrl+Shift+C">
+    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+    Copy All
+  </button>
+  <button class="btn" id="bSave" title="Ctrl+S — Download file">
+    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+    Save
+  </button>
+  <div class="tsp"></div>
+  <button class="btn ico" id="bSettings" title="Settings">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+  </button>
+</div>
+
+<!-- MAIN -->
+<div id="main">
+  <!-- EDITOR PANEL -->
+  <div id="ep">
+    <div id="eh">
+      <span id="fnBadge" style="color:var(--text);font-weight:500;">📄 Untitled</span>
+      <span id="wBadge" class="wb off">○ Not watching</span>
+      <span class="tsp"></span>
+      <button class="btn ico" id="bSnap" title="Take snapshot for diff" style="height:22px;width:22px;">
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+      </button>
+      <button class="btn ico" id="bFmt" title="Format HTML" style="height:22px;width:22px;">
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="21" y1="10" x2="7" y2="10"/><line x1="21" y1="6" x2="3" y2="6"/><line x1="21" y1="14" x2="3" y2="14"/><line x1="21" y1="18" x2="7" y2="18"/></svg>
+      </button>
+    </div>
+    <div id="ec">
+      <div id="es">
+        <svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+        <h3>No file loaded</h3>
+        <p>Drop an HTML file here, Open File, or Paste HTML to get started.</p>
+        <div style="margin-top:6px;display:flex;gap:8px;flex-wrap:wrap;justify-content:center">
+          <span style="font-size:10px;color:var(--text3)"><kbd>Ctrl+O</kbd> Open &nbsp;<kbd>Ctrl+F</kbd> Find &nbsp;<kbd>Ctrl+Shift+V</kbd> Paste</span>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- RESIZE HANDLE -->
+  <div id="rh"></div>
+  <!-- PREVIEW PANEL -->
+  <div id="pp">
+    <div id="ph">
+      <span class="plbl">👁 Preview</span>
+      <span class="tsp"></span>
+      <span id="upd-ind">● Updated</span>
+      <button class="btn ico" id="bRefPrev" title="F5 — Refresh preview" style="height:22px;width:22px;">
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+      </button>
+      <button class="btn ico" id="bNewTab" title="Open preview in new tab" style="height:22px;width:22px;">
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+      </button>
+    </div>
+    <iframe id="pf" allowfullscreen></iframe>
+  </div>
+</div>
+
+<!-- FIND/REPLACE BAR -->
+<div id="fb" class="hid">
+  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--text2)" stroke-width="2.5" style="flex-shrink:0"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+  <input class="fi" id="fi" placeholder="Find..." autocomplete="off" spellcheck="false">
+  <input class="fi" id="ri" placeholder="Replace with..." autocomplete="off" spellcheck="false">
+  <span class="fc" id="fc">–</span>
+  <div class="fsep"></div>
+  <button class="btn ico" id="bFPrev" title="Prev match (Shift+Enter)" style="height:26px;width:26px;">
+    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="18 15 12 9 6 15"/></svg>
+  </button>
+  <button class="btn ico" id="bFNext" title="Next match (Enter)" style="height:26px;width:26px;">
+    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+  </button>
+  <div class="fsep"></div>
+  <button class="btn" id="bRepOne" style="font-size:11px;height:26px;padding:0 8px">Replace</button>
+  <button class="btn" id="bRepAll" style="font-size:11px;height:26px;padding:0 8px">Replace All</button>
+  <button class="btn dang" id="bDelLines" style="font-size:11px;height:26px;padding:0 8px" title="Delete all lines containing match">Del Lines</button>
+  <div class="fsep"></div>
+  <label class="fcb" title="Case sensitive"><input type="checkbox" id="fcCase"> Aa</label>
+  <label class="fcb" title="Whole word"><input type="checkbox" id="fcWord"> \b</label>
+  <label class="fcb" title="Regular expression"><input type="checkbox" id="fcRgx"> .*</label>
+  <div class="tsp"></div>
+  <button class="btn ico" id="bFClose" style="height:26px;width:26px;">
+    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+  </button>
+</div>
+
+<!-- STATUSBAR -->
+<div id="sb">
+  <div class="si"><span id="sbFile" style="color:var(--text);font-weight:500">No file</span></div>
+  <div class="si"><div class="dot" id="sbDot"></div><span id="sbWatch">Ready</span></div>
+  <div class="si"><span id="sbSize"></span></div>
+  <div class="sp2"></div>
+  <div class="si"><span id="sbPos">Ln 1, Col 1</span></div>
+  <div class="si"><span id="sbLines"></span></div>
+  <div class="si"><span style="color:var(--text3)">HTML</span></div>
+</div>
+
+<!-- HISTORY PANEL -->
+<div id="hp">
+  <div class="ph2">
+    <span>📚 File History</span>
+    <button class="btn ico" id="bHClose" style="height:26px;width:26px;">
+      <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+  </div>
+  <div class="psr"><input type="text" id="hSearch" placeholder="Search history..." autocomplete="off"></div>
+  <div id="hl"></div>
+  <div style="padding:7px 10px;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;flex-shrink:0">
+    <span style="font-size:10px;color:var(--text2)" id="hCount"></span>
+    <button class="btn dang" id="bClearH" style="height:22px;font-size:10px;padding:0 8px">Clear All</button>
+  </div>
+</div>
+
+<!-- PASTE MODAL -->
+<div class="ov hid" id="pasteOv">
+  <div class="modal">
+    <div class="mh">📋 Paste HTML<button class="btn ico" id="bPasteX">✕</button></div>
+    <div class="mb">
+      <div style="font-size:11px;color:var(--text2);margin-bottom:8px">Paste your raw HTML source code:</div>
+      <textarea id="pta" placeholder="&lt;!DOCTYPE html&gt;&#10;&lt;html&gt;&#10;  ...&#10;&lt;/html&gt;"></textarea>
+    </div>
+    <div class="mf">
+      <button class="btn" id="bPasteCancel">Cancel</button>
+      <button class="btn pri" id="bPasteOk">Load HTML</button>
+    </div>
+  </div>
+</div>
+
+<!-- DIFF MODAL -->
+<div class="ov hid" id="diffOv">
+  <div class="modal wide tall">
+    <div class="mh">🔀 Diff Viewer<button class="btn ico" id="bDiffX">✕</button></div>
+    <div class="mb">
+      <div class="dsr">
+        <div class="dsc">
+          <label>Version A (before)</label>
+          <select id="dsA"><option value="snapshot">Current Snapshot</option></select>
+        </div>
+        <div class="dsc">
+          <label>Version B (after)</label>
+          <select id="dsB"><option value="current">Current Editor</option></select>
+        </div>
+        <button class="btn pri" id="bRunDiff" style="flex-shrink:0;align-self:flex-end">Compare →</button>
+      </div>
+      <div class="dleg">
+        <div class="dleg-i"><div class="dleg-c" style="background:rgba(34,211,160,.3)"></div> Added</div>
+        <div class="dleg-i"><div class="dleg-c" style="background:rgba(240,71,71,.3)"></div> Removed</div>
+        <div class="dleg-i"><div class="dleg-c" style="background:var(--surface3);border:1px solid var(--border)"></div> Unchanged</div>
+      </div>
+      <div id="dStats" class="dstats" style="display:none"></div>
+      <div id="dOut"></div>
+    </div>
+    <div class="mf">
+      <button class="btn warn" id="bDiffApply" style="display:none">Apply B to Editor</button>
+      <button class="btn" id="bDiffClose">Close</button>
+    </div>
+  </div>
+</div>
+
+<!-- SETTINGS MODAL -->
+<div class="ov hid" id="settOv">
+  <div class="modal">
+    <div class="mh">⚙️ Settings<button class="btn ico" id="bSettX">✕</button></div>
+    <div class="mb">
+      <div class="sg">
+        <div class="sf">
+          <label>Editor Theme</label>
+          <select id="sTheme">
+            <option value="monokai">Monokai (Dark)</option>
+            <option value="dracula">Dracula (Dark)</option>
+            <option value="material-darker">Material Darker</option>
+            <option value="default">Default (Light)</option>
+          </select>
+        </div>
+        <div class="sf">
+          <label>Font Size</label>
+          <div class="sfr">
+            <input type="range" id="sFontSize" min="10" max="22" step="1" value="13">
+            <span id="sFontLbl">13px</span>
+          </div>
+        </div>
+        <div class="sf">
+          <label>Tab Size</label>
+          <select id="sTab"><option value="2">2 spaces</option><option value="4">4 spaces</option></select>
+        </div>
+        <div class="sf">
+          <label>Word Wrap</label>
+          <select id="sWrap"><option value="false">Off</option><option value="true">On</option></select>
+        </div>
+        <div class="sf">
+          <label>Auto-Preview Delay</label>
+          <select id="sPrevDelay">
+            <option value="100">100ms (realtime)</option>
+            <option value="300" selected>300ms</option>
+            <option value="600">600ms</option>
+            <option value="1000">1 second</option>
+            <option value="0">Disabled</option>
+          </select>
+        </div>
+        <div class="sf">
+          <label>Watch Interval</label>
+          <select id="sWatchInt">
+            <option value="250">250ms (fastest)</option>
+            <option value="500" selected>500ms</option>
+            <option value="1000">1 second</option>
+            <option value="2000">2 seconds</option>
+          </select>
+        </div>
+      </div>
+      <div class="skbd">
+        <div><kbd>Ctrl+O</kbd> Open file</div>
+        <div><kbd>Ctrl+F</kbd> Find &amp; Replace</div>
+        <div><kbd>Ctrl+Shift+V</kbd> Paste HTML</div>
+        <div><kbd>Ctrl+S</kbd> Download file</div>
+        <div><kbd>Ctrl+Shift+C</kbd> Copy all</div>
+        <div><kbd>F5</kbd> Refresh preview</div>
+        <div><kbd>Ctrl+H</kbd> Toggle history</div>
+        <div><kbd>Esc</kbd> Close find bar</div>
+        <div><kbd>Enter</kbd> Next match</div>
+        <div><kbd>Shift+Enter</kbd> Prev match</div>
+      </div>
+    </div>
+    <div class="mf"><button class="btn pri" id="bSettSave">Apply Settings</button></div>
+  </div>
+</div>
+
+<input type="file" id="fi2" accept=".html,.htm,.svg" style="display:none">
+<div id="tc"></div>
+
+<script>
+'use strict';
+
+// ═══════════════════════════════════════════════════════
+// APP STATE
+// ═══════════════════════════════════════════════════════
+const A = {
+  editor: null,
+  file: { name: 'untitled.html', content: '' },
+  fileHandle: null,
+  lastMod: null,
+  watchTimer: null,
+  watching: false,
+  hasContent: false,
+  snapshot: null,
+  snapLabel: null,
+  prevTimer: null,
+  history: [],
+  db: null,
+  diffB: null,
+  ss: { // search state
+    q: '', matches: [], idx: -1,
+    markers: [], active: null
+  },
+  cfg: {
+    theme: 'monokai', fontSize: 13, tabSize: 2,
+    wrap: false, prevDelay: 300, watchInt: 500
+  }
+};
+
+// ═══════════════════════════════════════════════════════
+// INDEXED DB
+// ═══════════════════════════════════════════════════════
+function initDB() {
+  return new Promise((res, rej) => {
+    const r = indexedDB.open('hvp-db', 3);
+    r.onupgradeneeded = e => {
+      const db = e.target.result;
+      if (!db.objectStoreNames.contains('files')) {
+        const s = db.createObjectStore('files', { keyPath: 'id', autoIncrement: true });
+        s.createIndex('ts', 'ts');
+      }
+      if (!db.objectStoreNames.contains('cfg')) {
+        db.createObjectStore('cfg', { keyPath: 'k' });
+      }
+    };
+    r.onsuccess = e => res(e.target.result);
+    r.onerror = () => rej(r.error);
+  });
+}
+
+function dbTx(store, mode, fn) {
+  return new Promise((res, rej) => {
+    const tx = A.db.transaction(store, mode);
+    const st = tx.objectStore(store);
+    const r = fn(st);
+    if (r) { r.onsuccess = e => res(e.target.result); r.onerror = () => rej(r.error); }
+    else tx.oncomplete = res;
+  });
+}
+
+async function dbSave(name, content) {
+  if (!A.db) return;
+  await dbTx('files', 'readwrite', s => s.add({ name, content, ts: Date.now(), sz: content.length }));
+  // prune to 60 max
+  const all = await dbAll();
+  if (all.length > 60) {
+    for (const e of all.slice(60)) await dbDel(e.id);
+  }
+}
+
+function dbAll() {
+  return new Promise(res => {
+    const tx = A.db.transaction('files', 'readonly');
+    const r = tx.objectStore('files').getAll();
+    r.onsuccess = () => res((r.result || []).sort((a, b) => b.ts - a.ts));
+    r.onerror = () => res([]);
+  });
+}
+
+async function dbDel(id) {
+  return new Promise(res => {
+    const tx = A.db.transaction('files', 'readwrite');
+    tx.objectStore('files').delete(id);
+    tx.oncomplete = res;
+  });
+}
+
+async function dbClear() {
+  return new Promise(res => {
+    const tx = A.db.transaction('files', 'readwrite');
+    tx.objectStore('files').clear();
+    tx.oncomplete = res;
+  });
+}
+
+async function dbSetCfg(val) {
+  if (!A.db) return;
+  return new Promise(res => {
+    const tx = A.db.transaction('cfg', 'readwrite');
+    tx.objectStore('cfg').put({ k: 'cfg', v: val });
+    tx.oncomplete = res;
+  });
+}
+
+async function dbGetCfg() {
+  if (!A.db) return null;
+  return new Promise(res => {
+    const tx = A.db.transaction('cfg', 'readonly');
+    const r = tx.objectStore('cfg').get('cfg');
+    r.onsuccess = () => res(r.result ? r.result.v : null);
+    r.onerror = () => res(null);
+  });
+}
+
+// ═══════════════════════════════════════════════════════
+// EDITOR
+// ═══════════════════════════════════════════════════════
+function initEditor() {
+  const c = A.cfg;
+  A.editor = CodeMirror(document.getElementById('ec'), {
+    mode: 'htmlmixed', theme: c.theme,
+    lineNumbers: true, matchBrackets: true,
+    autoCloseTags: true, autoCloseBrackets: true,
+    foldGutter: true,
+    gutters: ['CodeMirror-linenumbers', 'CodeMirror-foldgutter'],
+    styleActiveLine: true,
+    lineWrapping: c.wrap,
+    tabSize: c.tabSize, indentUnit: c.tabSize, indentWithTabs: false,
+    extraKeys: {
+      'Ctrl-F': () => openFB(),
+      'Cmd-F': () => openFB(),
+      'Ctrl-H': () => toggleHP(),
+      'Cmd-H': () => toggleHP(),
+      'Ctrl-O': () => triggerOpen(),
+      'Cmd-O': () => triggerOpen(),
+      'Ctrl-S': () => dlFile(),
+      'Cmd-S': () => dlFile(),
+      'Ctrl-Shift-C': () => copyAll(),
+      'Cmd-Shift-C': () => copyAll(),
+      'F5': (cm, e) => { e.preventDefault(); forcePreview(); }
+    }
+  });
+
+  A.editor.on('change', () => {
+    A.file.content = A.editor.getValue();
+    schedulePrev();
+    updateSB();
+    liveSearch();
+    if (A.editor.getValue().length > 0) g('es').classList.add('hid');
+  });
+
+  A.editor.on('cursorActivity', updateSB);
+  setFont(c.fontSize);
+}
+
+// ═══════════════════════════════════════════════════════
+// FILE HANDLING
+// ═══════════════════════════════════════════════════════
+async function triggerOpen() {
+  if (window.showOpenFilePicker) {
+    try {
+      const [h] = await window.showOpenFilePicker({
+        types: [{ description: 'HTML Files', accept: { 'text/html': ['.html', '.htm', '.svg'] } }]
+      });
+      await openHandle(h);
+      return;
+    } catch (e) {
+      if (e.name === 'AbortError') return;
+    }
+  }
+  g('fi2').click();
+}
+
+async function openHandle(handle) {
+  try {
+    const file = await handle.getFile();
+    const txt = await file.text();
+    A.fileHandle = handle;
+    A.lastMod = file.lastModified;
+    await loadContent(txt, file.name);
+    startWatch();
+    toast(`Opened: ${file.name}`, 'ok');
+  } catch (e) { toast('Failed: ' + e.message, 'err'); }
+}
+
+async function openFile(file) {
+  const txt = await file.text();
+  A.fileHandle = null; A.lastMod = null;
+  await loadContent(txt, file.name);
+  toast(`Loaded: ${file.name}`, 'ok');
+}
+
+async function loadContent(content, name, isAuto = false) {
+  if (!isAuto) {
+    A.snapshot = content;
+    A.snapLabel = `${name} (opened ${fmtTime(Date.now())})`;
+  }
+
+  A.file = { name, content };
+  A.hasContent = true;
+
+  // Preserve cursor if auto-update
+  const cur = isAuto ? A.editor.getCursor() : null;
+  const scr = isAuto ? A.editor.getScrollInfo() : null;
+  A.editor.setValue(content);
+  if (!isAuto) { A.editor.clearHistory(); A.editor.scrollTo(0, 0); A.editor.setCursor(0, 0); }
+  else if (cur) { try { A.editor.setCursor(cur); A.editor.scrollTo(scr.left, scr.top); } catch(_) {} }
+
+  g('fnBadge').textContent = '📄 ' + name;
+  g('sbFile').textContent = name;
+  document.title = name + ' — HTML Viewer';
+  g('es').classList.add('hid');
+  forcePreview();
+  updateSB();
+
+  if (!isAuto) {
+    await dbSave(name, content);
+    await refreshHistory();
+  }
+  updateDiffSelects();
+}
+
+// ═══════════════════════════════════════════════════════
+// FILE WATCHING
+// ═══════════════════════════════════════════════════════
+function startWatch() {
+  stopWatch();
+  if (!A.fileHandle) return;
+  A.watchTimer = setInterval(async () => {
+    try {
+      const file = await A.fileHandle.getFile();
+      if (file.lastModified !== A.lastMod) {
+        A.lastMod = file.lastModified;
+        const nc = await file.text();
+        if (nc !== A.editor.getValue()) {
+          await loadContent(nc, A.file.name, true);
+          flashUpd();
+          toast('File updated from disk ⚡', 'info');
+        }
+      }
+    } catch (_) {}
+  }, A.cfg.watchInt);
+  A.watching = true;
+  updWB();
+}
+
+function stopWatch() {
+  if (A.watchTimer) { clearInterval(A.watchTimer); A.watchTimer = null; }
+  A.watching = false;
+  updWB();
+}
+
+function updWB() {
+  const b = g('wBadge'), d = g('sbDot'), s = g('sbWatch');
+  if (A.watching) {
+    b.className = 'wb on'; b.textContent = '● Watching';
+    d.className = 'dot on'; s.textContent = 'Auto-watching';
+  } else {
+    b.className = 'wb off'; b.textContent = '○ Not watching';
+    d.className = 'dot'; s.textContent = A.fileHandle ? 'Paused' : 'No handle';
+  }
+}
+
+function flashUpd() {
+  const el = g('upd-ind');
+  el.style.opacity = '1';
+  setTimeout(() => { el.style.opacity = '0'; }, 1800);
+}
+
+// ═══════════════════════════════════════════════════════
+// PREVIEW
+// ═══════════════════════════════════════════════════════
+function schedulePrev() {
+  const d = A.cfg.prevDelay;
+  if (d === 0) return;
+  if (A.prevTimer) clearTimeout(A.prevTimer);
+  A.prevTimer = setTimeout(forcePreview, d);
+}
+
+function forcePreview() {
+  const content = A.editor.getValue();
+  const f = g('pf');
+  f.srcdoc = content;
+  flashUpd();
+}
+
+// ═══════════════════════════════════════════════════════
+// FIND & REPLACE
+// ═══════════════════════════════════════════════════════
+function openFB(q = '') {
+  g('fb').classList.remove('hid');
+  const fi = g('fi');
+  const sel = A.editor.getSelection();
+  if (sel && !q) fi.value = sel;
+  else if (q) fi.value = q;
+  fi.focus(); fi.select();
+  if (fi.value) doSearch();
+}
+
+function closeFB() {
+  g('fb').classList.add('hid');
+  clearMarkers();
+  A.ss = { q: '', matches: [], idx: -1, markers: [], active: null };
+  g('fc').textContent = '–';
+  A.editor.focus();
+}
+
+function getQ() {
+  const raw = g('fi').value;
+  if (!raw) return null;
+  const cs = g('fcCase').checked;
+  const rx = g('fcRgx').checked;
+  const wb = g('fcWord').checked;
+  if (rx) {
+    try { return { q: new RegExp(raw, cs ? '' : 'i'), cs }; }
+    catch (_) { return null; }
+  }
+  if (wb) {
+    try { return { q: new RegExp('\\b' + xRx(raw) + '\\b', cs ? '' : 'i'), cs }; }
+    catch (_) {}
+  }
+  return { q: raw, cs };
+}
+
+function clearMarkers() {
+  A.ss.markers.forEach(m => m.clear());
+  A.ss.markers = [];
+  if (A.ss.active) { A.ss.active.clear(); A.ss.active = null; }
+}
+
+function doSearch() {
+  clearMarkers();
+  const qo = getQ();
+  const fi = g('fi');
+  A.ss.matches = []; A.ss.idx = -1;
+
+  if (!qo || !A.hasContent) {
+    g('fc').textContent = '–'; fi.classList.remove('nf'); return;
+  }
+
+  const cur = A.editor.getSearchCursor(qo.q, CodeMirror.Pos(0, 0), { caseFold: !qo.cs });
+  while (cur.findNext()) {
+    A.ss.matches.push({ from: cur.from(), to: cur.to() });
+    A.ss.markers.push(A.editor.markText(cur.from(), cur.to(), { className: 's-hi' }));
+  }
+
+  if (A.ss.matches.length === 0) {
+    g('fc').textContent = 'No results'; fi.classList.add('nf');
+  } else {
+    fi.classList.remove('nf'); nearestMatch();
+  }
+}
+
+function liveSearch() {
+  if (!g('fi').value || g('fb').classList.contains('hid')) return;
+  doSearch();
+}
+
+function nearestMatch() {
+  const ms = A.ss.matches;
+  if (!ms.length) return;
+  const c = A.editor.getCursor();
+  let n = 0;
+  for (let i = 0; i < ms.length; i++) {
+    const m = ms[i];
+    if (m.from.line > c.line || (m.from.line === c.line && m.from.ch >= c.ch)) { n = i; break; }
+    n = (i + 1) % ms.length;
+  }
+  A.ss.idx = n; setActive(n); updFC();
+}
+
+function navMatch(dir) {
+  const ms = A.ss.matches;
+  if (!ms.length) return;
+  if (A.ss.idx === -1) { nearestMatch(); return; }
+  A.ss.idx = (A.ss.idx + dir + ms.length) % ms.length;
+  setActive(A.ss.idx); updFC();
+}
+
+function setActive(i) {
+  if (A.ss.active) { A.ss.active.clear(); A.ss.active = null; }
+  const m = A.ss.matches[i];
+  if (!m) return;
+  A.ss.active = A.editor.markText(m.from, m.to, { className: 's-hi-a' });
+  A.editor.scrollIntoView({ from: m.from, to: m.to }, 80);
+  A.editor.setSelection(m.from, m.to);
+}
+
+function updFC() {
+  const ms = A.ss.matches;
+  g('fc').textContent = ms.length ? `${A.ss.idx + 1} / ${ms.length}` : 'No results';
+}
+
+function replaceOne() {
+  const qo = getQ(); if (!qo) return;
+  const rv = g('ri').value;
+  const m = A.ss.matches[A.ss.idx];
+  if (!m) { doSearch(); nearestMatch(); return; }
+  A.editor.replaceRange(rv, m.from, m.to);
+  doSearch(); navMatch(0);
+}
+
+function replaceAll() {
+  const qo = getQ(); if (!qo || !A.ss.matches.length) return;
+  const rv = g('ri').value;
+  const n = A.ss.matches.length;
+  A.editor.operation(() => {
+    [...A.ss.matches].reverse().forEach(m => A.editor.replaceRange(rv, m.from, m.to));
+  });
+  doSearch();
+  toast(`Replaced ${n} occurrence${n !== 1 ? 's' : ''}`, 'ok');
+}
+
+function delLines() {
+  if (!A.ss.matches.length) return;
+  const lines = [...new Set(A.ss.matches.map(m => m.from.line))].sort((a, b) => b - a);
+  A.editor.operation(() => {
+    lines.forEach(ln => {
+      const lc = A.editor.lineCount();
+      if (ln >= lc) return;
+      if (ln === lc - 1) {
+        const plen = ln > 0 ? A.editor.getLine(ln - 1).length : 0;
+        A.editor.replaceRange('', ln > 0 ? { line: ln - 1, ch: plen } : { line: ln, ch: 0 }, { line: ln, ch: A.editor.getLine(ln).length });
+      } else {
+        A.editor.replaceRange('', { line: ln, ch: 0 }, { line: ln + 1, ch: 0 });
+      }
+    });
+  });
+  doSearch();
+  toast(`Deleted ${lines.length} line${lines.length !== 1 ? 's' : ''}`, 'warn');
+}
+
+// ═══════════════════════════════════════════════════════
+// HISTORY
+// ═══════════════════════════════════════════════════════
+async function refreshHistory() {
+  A.history = await dbAll();
+  renderHistory(A.history);
+  updateDiffSelects();
+}
+
+function renderHistory(entries, filter = '') {
+  const list = g('hl');
+  let items = filter ? entries.filter(e => e.name.toLowerCase().includes(filter.toLowerCase())) : entries;
+  g('hCount').textContent = `${items.length} / ${entries.length} files`;
+
+  if (!items.length) {
+    list.innerHTML = `<div style="padding:20px;text-align:center;color:var(--text2);font-size:11px">${filter ? 'No matches.' : 'No history yet.'}</div>`;
+    return;
+  }
+
+  list.innerHTML = items.map(e => `
+    <div class="hi" data-id="${e.id}">
+      <div class="hi-name">📄 ${xH(e.name)}</div>
+      <div class="hi-meta"><span>${fmtTime(e.ts)}</span><span>${fmtSz(e.sz)}</span></div>
+      <div class="hi-acts">
+        <button class="hi-btn" onclick="hLoad(${e.id})">Load</button>
+        <button class="hi-btn" onclick="hCopy(${e.id})">Copy</button>
+        <button class="hi-btn" onclick="hSnap(${e.id})">Set Diff A</button>
+        <button class="hi-btn d" onclick="hDel(${e.id})">✕</button>
+      </div>
+    </div>`).join('');
+}
+
+async function hLoad(id) {
+  const e = A.history.find(x => x.id === id); if (!e) return;
+  stopWatch(); A.fileHandle = null;
+  await loadContent(e.content, e.name);
+  toast(`Loaded: ${e.name}`, 'info');
+}
+
+async function hCopy(id) {
+  const e = A.history.find(x => x.id === id); if (!e) return;
+  await clip(e.content); toast('Copied!', 'ok');
+}
+
+async function hDel(id) {
+  await dbDel(id); await refreshHistory(); toast('Removed', 'info');
+}
+
+function hSnap(id) {
+  const e = A.history.find(x => x.id === id); if (!e) return;
+  A.snapshot = e.content;
+  A.snapLabel = `${e.name} (${fmtTime(e.ts)})`;
+  updateDiffSelects();
+  toast(`Set as diff A: ${e.name}`, 'info');
+}
+
+function toggleHP() {
+  const p = g('hp'); p.classList.toggle('open');
+  if (p.classList.contains('open')) refreshHistory();
+}
+
+// ═══════════════════════════════════════════════════════
+// DIFF
+// ═══════════════════════════════════════════════════════
+function takeSnap() {
+  A.snapshot = A.editor.getValue();
+  A.snapLabel = `Manual snapshot ${fmtTime(Date.now())}`;
+  updateDiffSelects();
+  toast('Snapshot taken!', 'ok');
+}
+
+function updateDiffSelects() {
+  const sa = g('dsA'), sb = g('dsB');
+  sa.innerHTML = '';
+  if (A.snapshot) {
+    const o = document.createElement('option');
+    o.value = 'snap'; o.textContent = A.snapLabel || 'Snapshot';
+    sa.appendChild(o);
+  }
+  A.history.slice(0, 25).forEach(e => {
+    const o = document.createElement('option');
+    o.value = 'h_' + e.id; o.textContent = `${e.name} (${fmtTime(e.ts)})`;
+    sa.appendChild(o);
+  });
+
+  sb.innerHTML = '';
+  const oc = document.createElement('option');
+  oc.value = 'cur'; oc.textContent = 'Current Editor';
+  sb.appendChild(oc);
+  A.history.slice(0, 25).forEach(e => {
+    const o = document.createElement('option');
+    o.value = 'h_' + e.id; o.textContent = `${e.name} (${fmtTime(e.ts)})`;
+    sb.appendChild(o);
+  });
+}
+
+async function getVC(val) {
+  if (val === 'cur') return A.editor.getValue();
+  if (val === 'snap') return A.snapshot || '';
+  if (val.startsWith('h_')) {
+    const id = parseInt(val.slice(2));
+    const e = A.history.find(x => x.id === id);
+    return e ? e.content : '';
+  }
+  return '';
+}
+
+async function runDiff() {
+  const av = g('dsA').value, bv = g('dsB').value;
+  const ac = await getVC(av), bc = await getVC(bv);
+  if (!ac && !bc) { toast('No content', 'warn'); return; }
+
+  const diff = Diff.diffLines(ac, bc);
+  let add = 0, rem = 0;
+  diff.forEach(p => {
+    const n = p.value.split('\n').filter((l, i, a) => i < a.length - 1 || p.value.endsWith('\n') || i > 0).length;
+    if (p.added) add += n;
+    if (p.removed) rem += n;
+  });
+
+  const ds = g('dStats');
+  ds.style.display = 'flex';
+  ds.innerHTML = `<span style="color:var(--ok)">+${add} lines added</span><span style="color:var(--err)">-${rem} lines removed</span>`;
+
+  g('dOut').innerHTML = renderDiff(diff);
+
+  const ba = g('bDiffApply');
+  ba.style.display = bv !== 'cur' ? '' : 'none';
+  A.diffB = bc;
+}
+
+function renderDiff(diff) {
+  let html = '<div class="dv">', la = 1, lb = 1;
+  diff.forEach(p => {
+    const ls = p.value.split('\n');
+    if (ls[ls.length - 1] === '') ls.pop();
+    ls.forEach(line => {
+      const cls = p.added ? 'add' : p.removed ? 'rem' : 'unc';
+      const pfx = p.added ? '+' : p.removed ? '-' : ' ';
+      const n = p.added ? lb : la;
+      html += `<div class="dl ${cls}"><span class="dl-num">${n}</span><span class="dl-pfx">${pfx}</span><span class="dl-cnt">${xH(line) || '&nbsp;'}</span></div>`;
+      if (p.added) lb++;
+      else if (p.removed) la++;
+      else { la++; lb++; }
+    });
+  });
+  return html + '</div>';
+}
+
+// ═══════════════════════════════════════════════════════
+// CLIPBOARD & DOWNLOAD
+// ═══════════════════════════════════════════════════════
+async function copyAll() {
+  await clip(A.editor.getValue()); toast('Copied to clipboard!', 'ok');
+}
+
+async function clip(txt) {
+  try { await navigator.clipboard.writeText(txt); }
+  catch (_) {
+    const ta = document.createElement('textarea');
+    ta.value = txt; document.body.appendChild(ta); ta.select();
+    document.execCommand('copy'); document.body.removeChild(ta);
+  }
+}
+
+function dlFile() {
+  const c = A.editor.getValue(), n = A.file.name || 'output.html';
+  const b = new Blob([c], { type: 'text/html' });
+  const u = URL.createObjectURL(b);
+  const a = document.createElement('a');
+  a.href = u; a.download = n; a.click();
+  URL.revokeObjectURL(u);
+  toast(`Saved: ${n}`, 'ok');
+}
+
+function openNewTab() {
+  const b = new Blob([A.editor.getValue()], { type: 'text/html' });
+  window.open(URL.createObjectURL(b), '_blank');
+}
+
+// ═══════════════════════════════════════════════════════
+// SETTINGS
+// ═══════════════════════════════════════════════════════
+async function loadCfg() {
+  const c = await dbGetCfg();
+  if (c) A.cfg = { ...A.cfg, ...c };
+}
+
+async function saveCfg() {
+  A.cfg = {
+    theme: g('sTheme').value,
+    fontSize: parseInt(g('sFontSize').value),
+    tabSize: parseInt(g('sTab').value),
+    wrap: g('sWrap').value === 'true',
+    prevDelay: parseInt(g('sPrevDelay').value),
+    watchInt: parseInt(g('sWatchInt').value),
+  };
+  await dbSetCfg(A.cfg);
+  applyCfg();
+  g('settOv').classList.add('hid');
+  toast('Settings saved!', 'ok');
+  if (A.watching) { stopWatch(); startWatch(); }
+}
+
+function applyCfg() {
+  const c = A.cfg;
+  A.editor.setOption('theme', c.theme);
+  A.editor.setOption('tabSize', c.tabSize);
+  A.editor.setOption('indentUnit', c.tabSize);
+  A.editor.setOption('lineWrapping', c.wrap);
+  setFont(c.fontSize);
+}
+
+function setFont(sz) {
+  const cm = document.querySelector('.CodeMirror');
+  if (cm) cm.style.fontSize = sz + 'px';
+}
+
+function populateCfgUI() {
+  const c = A.cfg;
+  g('sTheme').value = c.theme;
+  g('sFontSize').value = c.fontSize;
+  g('sFontLbl').textContent = c.fontSize + 'px';
+  g('sTab').value = c.tabSize;
+  g('sWrap').value = String(c.wrap);
+  g('sPrevDelay').value = c.prevDelay;
+  g('sWatchInt').value = c.watchInt;
+}
+
+// ═══════════════════════════════════════════════════════
+// STATUS BAR
+// ═══════════════════════════════════════════════════════
+function updateSB() {
+  const e = A.editor, c = e.getCursor(), v = e.getValue();
+  g('sbPos').textContent = `Ln ${c.line + 1}, Col ${c.ch + 1}`;
+  g('sbSize').textContent = fmtSz(v.length);
+  g('sbLines').textContent = `${e.lineCount()} lines`;
+}
+
+// ═══════════════════════════════════════════════════════
+// FORMAT HTML (basic indenter)
+// ═══════════════════════════════════════════════════════
+function fmtHTML() {
+  try {
+    const voids = new Set(['area','base','br','col','embed','hr','img','input','link','meta','param','source','track','wbr','!doctype']);
+    let ind = 0;
+    const lines = A.editor.getValue()
+      .replace(/>\s+</g, '>\n<').split('\n')
+      .map(l => l.trim()).filter(Boolean);
+
+    const out = lines.map(l => {
+      // Close tag reduces indent before
+      if (/^<\//.test(l)) ind = Math.max(0, ind - 1);
+      const indented = '  '.repeat(ind) + l;
+      // Check if it's an open tag that should increase indent
+      const m = l.match(/^<([a-z][a-z0-9-]*)/i);
+      if (m && !voids.has(m[1].toLowerCase()) && !l.endsWith('/>') && !/^<\//.test(l)) {
+        // Check it's not a self-contained inline tag
+        const closeTag = '</' + m[1];
+        if (!l.includes(closeTag)) ind++;
+      }
+      return indented;
+    });
+
+    A.editor.setValue(out.join('\n'));
+    toast('HTML formatted!', 'ok');
+  } catch (e) { toast('Format error: ' + e.message, 'err'); }
+}
+
+// ═══════════════════════════════════════════════════════
+// CONTEXT MENU
+// ═══════════════════════════════════════════════════════
+function showCtxMenu(x, y) {
+  document.querySelectorAll('.cm2').forEach(m => m.remove());
+  const menu = document.createElement('div');
+  menu.className = 'cm2';
+  menu.style.cssText = `left:${x}px;top:${y}px`;
+
+  const items = [
+    { l: 'Find & Replace', s: 'Ctrl+F', fn: () => openFB() },
+    { sep: true },
+    { l: 'Copy All', s: 'Ctrl+Shift+C', fn: copyAll },
+    { l: 'Save / Download', s: 'Ctrl+S', fn: dlFile },
+    { l: 'Open in New Tab', fn: openNewTab },
+    { sep: true },
+    { l: 'Take Snapshot', fn: takeSnap },
+    { l: 'Format HTML', fn: fmtHTML },
+    { l: 'Refresh Preview', s: 'F5', fn: forcePreview },
+  ];
+
+  items.forEach(it => {
+    if (it.sep) {
+      const d = document.createElement('div'); d.className = 'cm2-sep'; menu.appendChild(d); return;
+    }
+    const el = document.createElement('div');
+    el.className = 'cm2-i';
+    el.innerHTML = `<span>${it.l}</span>${it.s ? `<span class="cm2-sc">${it.s}</span>` : ''}`;
+    el.onclick = () => { it.fn(); menu.remove(); };
+    menu.appendChild(el);
+  });
+
+  document.body.appendChild(menu);
+  const r = menu.getBoundingClientRect();
+  if (r.right > window.innerWidth) menu.style.left = (x - r.width) + 'px';
+  if (r.bottom > window.innerHeight) menu.style.top = (y - r.height) + 'px';
+  setTimeout(() => document.addEventListener('click', () => menu.remove(), { once: true }), 10);
+}
+
+// ═══════════════════════════════════════════════════════
+// DRAG & DROP
+// ═══════════════════════════════════════════════════════
+function initDD() {
+  const dz = g('dz');
+  document.addEventListener('dragover', e => { e.preventDefault(); dz.classList.add('vis'); });
+  document.addEventListener('dragleave', e => { if (!e.relatedTarget) dz.classList.remove('vis'); });
+  document.addEventListener('drop', async e => {
+    e.preventDefault(); dz.classList.remove('vis');
+    const files = [...e.dataTransfer.files].filter(f =>
+      f.type === 'text/html' || /\.(html?|svg)$/i.test(f.name));
+    if (!files.length) { toast('Please drop an HTML file', 'warn'); return; }
+    await openFile(files[0]);
+
+    // Try to get File System Access handle for watching
+    if (e.dataTransfer.items?.[0]?.getAsFileSystemHandle) {
+      try {
+        const h = await e.dataTransfer.items[0].getAsFileSystemHandle();
+        if (h.kind === 'file') {
+          A.fileHandle = h;
+          A.lastMod = (await h.getFile()).lastModified;
+          startWatch();
+        }
+      } catch (_) {}
+    }
+  });
+}
+
+// ═══════════════════════════════════════════════════════
+// RESIZE HANDLE
+// ═══════════════════════════════════════════════════════
+function initResize() {
+  const rh = g('rh'), ep = g('ep');
+  let drag = false, sx = 0, sw = 0;
+
+  rh.addEventListener('mousedown', e => {
+    drag = true; sx = e.clientX; sw = ep.offsetWidth;
+    rh.classList.add('act');
+    document.body.style.cssText = 'cursor:col-resize;user-select:none';
+    g('pf').style.pointerEvents = 'none';
+  });
+
+  document.addEventListener('mousemove', e => {
+    if (!drag) return;
+    const w = Math.max(200, Math.min(sw + e.clientX - sx, g('main').offsetWidth - 200));
+    ep.style.width = w + 'px'; ep.style.flex = 'none';
+    A.editor.refresh();
+  });
+
+  document.addEventListener('mouseup', () => {
+    if (!drag) return;
+    drag = false; rh.classList.remove('act');
+    document.body.style.cssText = '';
+    g('pf').style.pointerEvents = '';
+    A.editor.refresh();
+  });
+
+  rh.addEventListener('dblclick', () => {
+    ep.style.width = ''; ep.style.flex = '';
+    setTimeout(() => A.editor.refresh(), 50);
+  });
+}
+
+// ═══════════════════════════════════════════════════════
+// TOAST
+// ═══════════════════════════════════════════════════════
+function toast(msg, type = 'info', dur = 3000) {
+  const t = document.createElement('div');
+  t.className = `toast ${type}`; t.textContent = msg;
+  g('tc').appendChild(t);
+  setTimeout(() => { t.style.cssText = 'opacity:0;transition:opacity .3s'; setTimeout(() => t.remove(), 300); }, dur);
+}
+
+// ═══════════════════════════════════════════════════════
+// UTILITIES
+// ═══════════════════════════════════════════════════════
+const g = id => document.getElementById(id);
+const xH = s => s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+const xRx = s => s.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
+
+function fmtTime(ts) {
+  const d = new Date(ts), now = Date.now(), diff = now - ts;
+  if (diff < 60000) return 'just now';
+  if (diff < 3600000) return Math.floor(diff/60000) + 'm ago';
+  if (diff < 86400000) return Math.floor(diff/3600000) + 'h ago';
+  return d.toLocaleDateString('id-ID', { day:'2-digit', month:'short', hour:'2-digit', minute:'2-digit' });
+}
+
+function fmtSz(b) {
+  if (b < 1024) return b + ' B';
+  if (b < 1048576) return (b/1024).toFixed(1) + ' KB';
+  return (b/1048576).toFixed(1) + ' MB';
+}
+
+// ═══════════════════════════════════════════════════════
+// EVENT LISTENERS
+// ═══════════════════════════════════════════════════════
+function initEvents() {
+  // Topbar
+  g('bOpen').onclick = triggerOpen;
+  g('fi2').onchange = e => { if (e.target.files[0]) { openFile(e.target.files[0]); e.target.value=''; } };
+  g('bPaste').onclick = () => { g('pasteOv').classList.remove('hid'); setTimeout(() => g('pta').focus(), 80); };
+  g('bHistory').onclick = toggleHP;
+  g('bDiff').onclick = async () => { await refreshHistory(); updateDiffSelects(); g('diffOv').classList.remove('hid'); };
+  g('bCopy').onclick = copyAll;
+  g('bSave').onclick = dlFile;
+  g('bSettings').onclick = () => { populateCfgUI(); g('settOv').classList.remove('hid'); };
+
+  // Editor header
+  g('bSnap').onclick = takeSnap;
+  g('bFmt').onclick = fmtHTML;
+
+  // Preview header
+  g('bRefPrev').onclick = forcePreview;
+  g('bNewTab').onclick = openNewTab;
+
+  // Paste modal
+  g('bPasteOk').onclick = async () => {
+    const c = g('pta').value.trim();
+    if (!c) { toast('Nothing to load!', 'warn'); return; }
+    g('pasteOv').classList.add('hid'); g('pta').value = '';
+    await loadContent(c, 'pasted.html');
+    toast('HTML loaded!', 'ok');
+  };
+  g('bPasteCancel').onclick = g('bPasteX').onclick = () => g('pasteOv').classList.add('hid');
+  g('pta').addEventListener('keydown', e => { if (e.ctrlKey && e.key === 'Enter') g('bPasteOk').click(); });
+
+  // History
+  g('bHClose').onclick = () => g('hp').classList.remove('open');
+  g('hSearch').oninput = e => renderHistory(A.history, e.target.value);
+  g('bClearH').onclick = async () => {
+    if (!confirm('Clear all history?')) return;
+    await dbClear(); A.history = []; renderHistory([]);
+    toast('History cleared', 'warn');
+  };
+
+  // Find bar
+  g('fi').oninput = doSearch;
+  g('fcCase').onchange = g('fcWord').onchange = g('fcRgx').onchange = doSearch;
+  g('bFPrev').onclick = () => navMatch(-1);
+  g('bFNext').onclick = () => navMatch(1);
+  g('bRepOne').onclick = replaceOne;
+  g('bRepAll').onclick = replaceAll;
+  g('bDelLines').onclick = delLines;
+  g('bFClose').onclick = closeFB;
+
+  // Diff
+  g('bRunDiff').onclick = runDiff;
+  g('bDiffX').onclick = g('bDiffClose').onclick = () => g('diffOv').classList.add('hid');
+  g('bDiffApply').onclick = () => {
+    if (A.diffB !== null) { A.editor.setValue(A.diffB); forcePreview(); g('diffOv').classList.add('hid'); toast('Applied to editor', 'ok'); }
+  };
+
+  // Settings
+  g('bSettX').onclick = () => g('settOv').classList.add('hid');
+  g('bSettSave').onclick = saveCfg;
+  g('sFontSize').oninput = e => g('sFontLbl').textContent = e.target.value + 'px';
+
+  // Close modals on overlay click
+  ['pasteOv','diffOv','settOv'].forEach(id => {
+    g(id).addEventListener('click', e => { if (e.target === g(id)) g(id).classList.add('hid'); });
+  });
+
+  // History panel outside click
+  document.addEventListener('click', e => {
+    const hp = g('hp');
+    if (hp.classList.contains('open') && !hp.contains(e.target) && e.target !== g('bHistory') && !g('bHistory').contains(e.target)) {
+      hp.classList.remove('open');
+    }
+  });
+
+  // Context menu on editor
+  g('ec').addEventListener('contextmenu', e => { e.preventDefault(); showCtxMenu(e.clientX, e.clientY); });
+
+  // Global keyboard shortcuts
+  document.addEventListener('keydown', e => {
+    const fb = g('fb');
+    if (!fb.classList.contains('hid')) {
+      if (e.key === 'Escape') { e.preventDefault(); closeFB(); return; }
+      if ((e.target === g('fi') || e.target === g('ri')) && e.key === 'Enter') {
+        e.preventDefault();
+        e.shiftKey ? navMatch(-1) : navMatch(1);
+        return;
+      }
+    }
+    if ((e.ctrlKey || e.metaKey) && !e.altKey) {
+      if (e.key === 'o' && !e.shiftKey) { e.preventDefault(); triggerOpen(); }
+      if ((e.key === 'v' || e.key === 'V') && e.shiftKey) { e.preventDefault(); g('bPaste').click(); }
+    }
+    if (e.key === 'F5') { e.preventDefault(); forcePreview(); }
+  });
+}
+
+// Make history actions global (called from innerHTML)
+window.hLoad = hLoad;
+window.hCopy = hCopy;
+window.hDel = hDel;
+window.hSnap = hSnap;
+
+// ═══════════════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════════════
+async function init() {
+  try {
+    A.db = await initDB();
+    await loadCfg();
+    initEditor();
+    initEvents();
+    initDD();
+    initResize();
+    await refreshHistory();
+    updWB();
+    applyCfg();
+  } catch (e) {
+    console.error('Init failed:', e);
+    toast('Init error: ' + e.message, 'err', 6000);
+  }
+}
+
+init();
+</script>
+</body>
+</html>

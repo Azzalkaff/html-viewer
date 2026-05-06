@@ -51,7 +51,7 @@
             flex: 1;
             height: 100% !important;
             font-family: 'Fira Code', monospace;
-            font-size: 15px;
+            font-size: 14px;
             line-height: 1.6;
             width: 100%;
         }
@@ -65,8 +65,7 @@
     <!-- Header / App Bar -->
     <header class="bg-[#5c8d42] text-white h-16 flex justify-between items-center px-6 material-shadow z-20 shrink-0">
         <div class="flex items-center gap-4">
-            <!-- Back Button (Hidden on Dashboard) -->
-            <button id="btn-back" onclick="showDashboard()" class="hidden hover:bg-[#4a7235] p-2 rounded-full transition -ml-2">
+            <button id="btn-back" onclick="showDashboard()" class="hidden hover:bg-[#4a7235] p-2 rounded-full transition -ml-2" title="Kembali ke Dashboard">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
                 </svg>
@@ -75,10 +74,20 @@
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
                 </svg>
-                <h1 class="text-xl font-medium tracking-wide">Vibe-HTML Viewer</h1>
+                <h1 class="text-xl font-medium tracking-wide">Vibe-HTML</h1>
             </div>
         </div>
-        <div id="active-file-name" class="text-sm font-medium bg-green-800 px-4 py-1.5 rounded-full hidden truncate max-w-[200px] md:max-w-md"></div>
+        
+        <!-- File Name Wrapper -->
+        <div id="file-name-wrapper" class="hidden items-center gap-2">
+            <div id="active-file-name-container" class="flex items-center gap-2 bg-green-800 hover:bg-green-700 px-4 py-1.5 rounded-full cursor-pointer transition shadow-sm" onclick="enableRename()" title="Klik untuk mengubah nama">
+                <span id="active-file-name" class="text-sm font-medium truncate max-w-[200px] md:max-w-md"></span>
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 text-green-200" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                </svg>
+            </div>
+            <input type="text" id="rename-input" class="hidden text-sm font-medium bg-green-900 text-white px-4 py-1.5 rounded-full outline-none focus:ring-2 focus:ring-green-400 w-48 md:w-64 transition" />
+        </div>
     </header>
 
     <main class="flex-1 flex overflow-hidden relative">
@@ -87,9 +96,7 @@
         <section id="dashboard-view" class="flex-1 flex flex-col items-center pt-16 px-6 overflow-y-auto w-full">
             <h2 class="text-3xl font-light mb-10 text-gray-800">Mulai Sesi Baru</h2>
             
-            <!-- Action Cards -->
             <div class="flex flex-wrap gap-6 mb-16 justify-center w-full max-w-3xl">
-                <!-- New Project Card -->
                 <button onclick="createNewFile()" class="flex-1 min-w-[250px] bg-white p-8 rounded-2xl material-shadow material-shadow-hover transition flex flex-col items-center justify-center gap-4 group border border-transparent hover:border-green-200">
                     <div class="p-4 bg-green-50 rounded-full group-hover:bg-green-100 transition">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-[#5c8d42]" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" /></svg>
@@ -98,7 +105,6 @@
                     <span class="text-sm text-gray-500">Mulai dari kanvas kosong</span>
                 </button>
 
-                <!-- Open File Card -->
                 <input type="file" id="file-input" accept=".html,.htm,.txt" class="hidden">
                 <button onclick="document.getElementById('file-input').click()" class="flex-1 min-w-[250px] bg-white p-8 rounded-2xl material-shadow material-shadow-hover transition flex flex-col items-center justify-center gap-4 group border border-transparent hover:border-green-200">
                     <div class="p-4 bg-green-50 rounded-full group-hover:bg-green-100 transition">
@@ -109,7 +115,6 @@
                 </button>
             </div>
 
-            <!-- History Section -->
             <div class="w-full max-w-4xl bg-white rounded-2xl material-shadow overflow-hidden flex flex-col">
                 <div class="px-6 py-4 border-b bg-gray-50 flex justify-between items-center">
                     <h3 class="text-lg font-medium text-gray-700 flex items-center gap-2">
@@ -118,9 +123,7 @@
                     </h3>
                     <button onclick="clearHistory()" class="text-sm text-red-500 hover:text-red-700 hover:underline">Hapus Semua</button>
                 </div>
-                <div id="dashboard-history-list" class="flex-1 max-h-[400px] overflow-y-auto p-2">
-                    <!-- History items rendered here -->
-                </div>
+                <div id="dashboard-history-list" class="flex-1 max-h-[400px] overflow-y-auto p-2"></div>
             </div>
         </section>
 
@@ -128,7 +131,6 @@
         <!-- ================= WORKSPACE (EDITOR) VIEW ================= -->
         <section id="workspace-view" class="hidden flex-1 flex flex-col overflow-hidden bg-white w-full">
             
-            <!-- Editor Toolbar (Always Visible in Workspace) -->
             <div class="h-14 border-b flex items-center px-6 justify-between bg-white shrink-0">
                 <div class="flex items-center gap-4 text-sm text-gray-500 italic">
                     <span id="save-status">Tersimpan di riwayat</span>
@@ -148,27 +150,39 @@
             <!-- Content Area -->
             <div class="flex-1 relative overflow-hidden flex flex-col bg-[#fcfcfc]">
                 
-                <!-- Full Editor Panel -->
                 <div id="code-container" class="absolute inset-0 flex flex-col z-10 bg-white">
-                    <!-- Vibe Tools (Search & Replace) -->
-                    <div class="p-3 bg-gray-50 border-b flex flex-wrap gap-3 items-center shrink-0 shadow-sm">
-                        <div class="flex items-center gap-2 text-gray-600 border-r pr-3">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-[#5c8d42]" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
-                            <span class="text-sm font-medium">Vibe Tools</span>
+                    <!-- Search & Replace Tools -->
+                    <div class="p-3 bg-gray-50 border-b flex flex-col gap-2 shrink-0 shadow-sm">
+                        <div class="flex flex-col md:flex-row gap-3">
+                            <!-- Multiline inputs for AI Code pasting -->
+                            <div class="flex-1">
+                                <textarea id="find-input" rows="2" placeholder="Cari Kode (Paste multiline dari AI)..." class="w-full px-3 py-2 border border-gray-300 rounded text-sm code-font focus:ring-2 focus:ring-green-400 outline-none resize-y" spellcheck="false"></textarea>
+                            </div>
+                            <div class="flex-1">
+                                <textarea id="replace-input" rows="2" placeholder="Ganti Menjadi (Paste multiline)..." class="w-full px-3 py-2 border border-gray-300 rounded text-sm code-font focus:ring-2 focus:ring-green-400 outline-none resize-y" spellcheck="false"></textarea>
+                            </div>
                         </div>
-                        <div class="flex-1 min-w-[200px]">
-                            <input type="text" id="find-input" placeholder="Cari Kode (Search)..." class="w-full px-3 py-1.5 border border-gray-300 rounded text-sm code-font focus:ring-2 focus:ring-green-400 outline-none">
+                        
+                        <div class="flex justify-between items-center mt-1">
+                            <div class="flex flex-wrap gap-2 items-center">
+                                <button onclick="findExact()" class="px-4 py-1.5 bg-gray-200 hover:bg-gray-300 text-gray-800 rounded-md text-sm font-semibold transition shadow-sm border border-gray-300" title="Pencarian Cepat Sama Persis (Shortcut: Enter)">
+                                    Find (Exact)
+                                </button>
+                                
+                                <button onclick="fuzzyFind()" class="px-4 py-1.5 bg-amber-100 hover:bg-amber-200 text-amber-800 border border-amber-300 rounded-md text-sm font-semibold transition shadow-sm flex items-center gap-1" title="Cari blok kode yang mirip (Abaikan Typo/Halusinasi AI)">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
+                                    ⚡ Fuzzy Find (AI)
+                                </button>
+                                
+                                <div class="w-px h-6 bg-gray-300 mx-1"></div>
+                                
+                                <button onclick="replaceAll()" class="px-4 py-1.5 bg-[#5c8d42] hover:bg-[#4a7235] text-white rounded-md text-sm font-semibold transition shadow-sm border border-[#4a7235]">Replace All</button>
+                                <button onclick="deleteFound()" class="px-4 py-1.5 bg-red-50 hover:bg-red-100 text-red-600 border border-red-200 rounded-md text-sm font-semibold transition">Find & Delete</button>
+                            </div>
+                            <div id="search-status" class="whitespace-nowrap text-xs text-gray-600 font-medium px-2 py-1 bg-gray-200 rounded">0 Hasil</div>
                         </div>
-                        <div class="flex-1 min-w-[200px]">
-                            <input type="text" id="replace-input" placeholder="Ganti Menjadi (Replace)..." class="w-full px-3 py-1.5 border border-gray-300 rounded text-sm code-font focus:ring-2 focus:ring-green-400 outline-none">
-                        </div>
-                        <div class="flex gap-2">
-                            <button onclick="findOnly()" class="px-4 py-1.5 bg-gray-200 hover:bg-gray-300 text-gray-800 rounded text-sm font-medium transition">Find</button>
-                            <button onclick="replaceAll()" class="px-4 py-1.5 bg-[#5c8d42] hover:bg-[#4a7235] text-white rounded text-sm font-medium transition shadow-sm">Replace All</button>
-                            <button onclick="deleteFound()" class="px-4 py-1.5 bg-red-100 hover:bg-red-200 text-red-700 border border-red-200 rounded text-sm font-medium transition">Find & Delete</button>
-                        </div>
-                        <div id="search-status" class="text-xs text-gray-500 font-medium ml-2 min-w-[100px]"></div>
                     </div>
+                    
                     <!-- The actual textarea -->
                     <textarea id="main-editor" class="flex-1 w-full p-6 outline-none resize-none code-font text-[15px] leading-relaxed whitespace-pre" spellcheck="false"></textarea>
                 </div>
@@ -198,20 +212,31 @@
         let currentFileId = null;
         let isPreviewMode = false;
         let autoSaveTimeout = null;
-        let cmEditor = null; // CodeMirror instance
+        let cmEditor = null; 
         
-        // --- State Pencarian (Agar Find Next berfungsi seperti Ctrl+F biasa) ---
-        let lastSearchTerm = "";
-        let lastSearchCursor = null;
+        // --- State Management Pencarian ---
+        let activeSearchMode = 'exact'; // 'exact' atau 'fuzzy'
+        
+        // State Exact Find
+        let lastExactTerm = "";
+        let exactCursor = null;
 
-        // --- UI Element Cache (Optimasi DOM Queries) ---
+        // State Fuzzy Find
+        let lastFuzzyTerm = "";
+        let fuzzyResults = []; 
+        let currentFuzzyIndex = -1;
+
+        // --- UI Element Cache ---
         const UI = {};
 
         const cacheUIElements = () => {
             UI.dashboardView = document.getElementById('dashboard-view');
             UI.workspaceView = document.getElementById('workspace-view');
             UI.btnBack = document.getElementById('btn-back');
+            UI.fileNameWrapper = document.getElementById('file-name-wrapper');
+            UI.fileNameContainer = document.getElementById('active-file-name-container');
             UI.activeFileName = document.getElementById('active-file-name');
+            UI.renameInput = document.getElementById('rename-input');
             UI.historyList = document.getElementById('dashboard-history-list');
             UI.saveStatus = document.getElementById('save-status');
             UI.findInput = document.getElementById('find-input');
@@ -224,61 +249,115 @@
 
         // --- IndexedDB Setup ---
         const initDB = () => {
-            cacheUIElements(); // Inisialisasi Cache DOM terlebih dahulu
+            cacheUIElements(); 
             
-            // Mengaktifkan fitur pencarian hanya dengan tombol Enter
+            // Enter key acts as FAST Exact Find. Shift+Enter creates a new line in textarea.
             UI.findInput.addEventListener('keydown', (e) => {
-                if (e.key === 'Enter') {
+                if (e.key === 'Enter' && !e.shiftKey) {
                     e.preventDefault();
-                    findOnly();
-                }
-            });
-            UI.replaceInput.addEventListener('keydown', (e) => {
-                if (e.key === 'Enter') {
-                    e.preventDefault();
-                    replaceAll();
+                    findExact();
                 }
             });
 
+            UI.renameInput.addEventListener('blur', saveRename);
+            UI.renameInput.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') { e.preventDefault(); UI.renameInput.blur(); } 
+                else if (e.key === 'Escape') { UI.renameInput.value = UI.activeFileName.innerText; UI.renameInput.blur(); }
+            });
+
             return new Promise((resolve, reject) => {
-                // Dioptimasi ke versi 2 untuk menambahkan index timestamp
                 const request = indexedDB.open(DB_NAME, 2); 
                 request.onupgradeneeded = (e) => {
                     const db = e.target.result;
-                    let store;
-                    if (!db.objectStoreNames.contains(STORE_NAME)) {
-                        store = db.createObjectStore(STORE_NAME, { keyPath: "id", autoIncrement: true });
-                    } else {
-                        store = e.target.transaction.objectStore(STORE_NAME);
-                    }
-                    // Menambahkan Index Database asli untuk sortir cepat (Optimasi)
-                    if (!store.indexNames.contains("timestamp")) {
-                        store.createIndex("timestamp", "timestamp", { unique: false });
-                    }
+                    let store = db.objectStoreNames.contains(STORE_NAME) 
+                        ? e.target.transaction.objectStore(STORE_NAME) 
+                        : db.createObjectStore(STORE_NAME, { keyPath: "id", autoIncrement: true });
+                    if (!store.indexNames.contains("timestamp")) store.createIndex("timestamp", "timestamp", { unique: false });
                 };
                 request.onsuccess = (e) => {
                     db = e.target.result;
                     loadDashboardHistory();
                     resolve();
                 };
-                request.onerror = (e) => reject(e);
             });
+        };
+
+        // --- Algoritma Fuzzy Search Prioritas (Toleransi Typo & Halusinasi AI) ---
+        const calculateSimilarity = (str1, str2) => {
+            const s1 = str1.replace(/\s+/g, '').toLowerCase();
+            const s2 = str2.replace(/\s+/g, '').toLowerCase();
+            
+            if (s1 === s2) return 1.0;
+            if (s1.length < 2 || s2.length < 2) return s1 === s2 ? 1.0 : 0.0;
+            
+            const map1 = new Map();
+            for (let i = 0; i < s1.length - 1; i++) {
+                const bg = s1.substring(i, i + 2);
+                map1.set(bg, (map1.get(bg) || 0) + 1);
+            }
+            
+            let intersection = 0;
+            for (let i = 0; i < s2.length - 1; i++) {
+                const bg = s2.substring(i, i + 2);
+                if (map1.has(bg) && map1.get(bg) > 0) {
+                    intersection++;
+                    map1.set(bg, map1.get(bg) - 1);
+                }
+            }
+            return (2.0 * intersection) / ((s1.length - 1) + (s2.length - 1));
+        };
+
+        const buildFuzzyResults = (searchText) => {
+            fuzzyResults = [];
+            const docLines = cmEditor.getValue().split('\n');
+            const queryLines = searchText.split('\n');
+            const N = queryLines.length;
+
+            const tempMatches = [];
+            // Buat sliding window dinamis jika AI menghilangkan atau menambah beberapa baris
+            const windowSizes = [N - 2, N - 1, N, N + 1, N + 2].filter(w => w > 0);
+            
+            for (let i = 0; i < docLines.length; i++) {
+                for (let w of windowSizes) {
+                    if (i + w > docLines.length) continue;
+                    
+                    const windowText = docLines.slice(i, i + w).join('\n');
+                    const score = calculateSimilarity(searchText, windowText);
+                    
+                    // Toleransi minimal kemiripan > 45% untuk dianggap kandidat
+                    if (score > 0.45) {
+                        tempMatches.push({
+                            type: 'fuzzy',
+                            from: {line: i, ch: 0},
+                            to: {line: i + w - 1, ch: docLines[i + w - 1].length},
+                            score: score
+                        });
+                    }
+                }
+            }
+            
+            // Sort by score (Highest First)
+            tempMatches.sort((a, b) => b.score - a.score);
+            
+            // Buang baris yang overlap (hanya simpan yang terbaik)
+            for (let match of tempMatches) {
+                let isOverlap = false;
+                for (let fm of fuzzyResults) {
+                    if (Math.max(match.from.line, fm.from.line) <= Math.min(match.to.line, fm.to.line)) {
+                        isOverlap = true; break;
+                    }
+                }
+                if (!isOverlap) fuzzyResults.push(match);
+            }
         };
 
         // --- Database Operations ---
         const saveNewProject = (name, content) => {
             const transaction = db.transaction([STORE_NAME], "readwrite");
             const store = transaction.objectStore(STORE_NAME);
-            const item = {
-                name: name,
-                content: content,
-                timestamp: new Date().getTime()
-            };
+            const item = { name: name, content: content, timestamp: new Date().getTime() };
             const request = store.add(item);
-            request.onsuccess = (e) => {
-                currentFileId = e.target.result; 
-                loadDashboardHistory();
-            };
+            request.onsuccess = (e) => { currentFileId = e.target.result; loadDashboardHistory(); };
         };
 
         const updateExistingProject = (id, content) => {
@@ -300,17 +379,8 @@
         const loadDashboardHistory = () => {
             const transaction = db.transaction([STORE_NAME], "readonly");
             const store = transaction.objectStore(STORE_NAME);
+            let request = store.indexNames.contains("timestamp") ? store.index("timestamp").openCursor(null, "prev") : store.openCursor();
             
-            // Optimasi: Gunakan Native Cursor + Index Descending (Menghindari proses sort di Memory JS)
-            let index;
-            let request;
-            if (store.indexNames.contains("timestamp")) {
-                index = store.index("timestamp");
-                request = index.openCursor(null, "prev"); // Cursor mundur (descending)
-            } else {
-                request = store.openCursor(); // Fallback untuk transisi versi
-            }
-
             let resultsHTML = '';
             let count = 0;
 
@@ -337,12 +407,8 @@
                     count++;
                     cursor.continue();
                 } else {
-                    // Selesai memproses kursor
-                    if (count === 0) {
-                        UI.historyList.innerHTML = '<div class="p-10 text-center text-gray-400">Belum ada riwayat file yang disimpan.</div>';
-                    } else {
-                        UI.historyList.innerHTML = resultsHTML;
-                    }
+                    if (count === 0) UI.historyList.innerHTML = '<div class="p-10 text-center text-gray-400">Belum ada riwayat file yang disimpan.</div>';
+                    else UI.historyList.innerHTML = resultsHTML;
                 }
             };
         };
@@ -376,14 +442,45 @@
             };
         };
 
+        // --- Rename Feature Logic ---
+        const enableRename = () => {
+            UI.fileNameContainer.classList.add('hidden');
+            UI.fileNameContainer.classList.remove('flex');
+            UI.renameInput.value = UI.activeFileName.innerText;
+            UI.renameInput.classList.remove('hidden');
+            UI.renameInput.focus();
+            UI.renameInput.select();
+        };
+
+        const saveRename = () => {
+            const newName = UI.renameInput.value.trim();
+            if (newName && newName !== UI.activeFileName.innerText && currentFileId) {
+                const transaction = db.transaction([STORE_NAME], "readwrite");
+                const store = transaction.objectStore(STORE_NAME);
+                store.get(currentFileId).onsuccess = (e) => {
+                    const item = e.target.result;
+                    if(item) {
+                        item.name = newName;
+                        store.put(item);
+                        UI.activeFileName.innerText = newName;
+                        UI.activeFileName.title = newName;
+                        showToast("Nama file berhasil diubah!");
+                        loadDashboardHistory(); 
+                    }
+                };
+            }
+            UI.renameInput.classList.add('hidden');
+            UI.fileNameContainer.classList.remove('hidden');
+            UI.fileNameContainer.classList.add('flex');
+        };
+
         // --- View Management ---
         const showDashboard = () => {
             UI.dashboardView.classList.remove('hidden');
             UI.workspaceView.classList.add('hidden');
-            
-            // UI Header updates
             UI.btnBack.classList.add('hidden');
-            UI.activeFileName.classList.add('hidden');
+            UI.fileNameWrapper.classList.add('hidden');
+            UI.fileNameWrapper.classList.remove('flex');
             
             currentFileId = null; 
             loadDashboardHistory();
@@ -395,13 +492,16 @@
             UI.workspaceView.classList.remove('hidden');
             UI.workspaceView.classList.add('fade-enter-active');
             
-            // Header updates
             UI.btnBack.classList.remove('hidden');
+            UI.fileNameWrapper.classList.remove('hidden');
+            UI.fileNameWrapper.classList.add('flex');
             UI.activeFileName.innerText = name;
             UI.activeFileName.title = name;
-            UI.activeFileName.classList.remove('hidden');
             
-            // Initialize CodeMirror if not yet initialized
+            UI.fileNameContainer.classList.remove('hidden');
+            UI.fileNameContainer.classList.add('flex');
+            UI.renameInput.classList.add('hidden');
+            
             if (!cmEditor) {
                 cmEditor = CodeMirror.fromTextArea(document.getElementById("main-editor"), {
                     mode: "htmlmixed",
@@ -421,46 +521,48 @@
                             UI.findInput.focus();
                             UI.findInput.select();
                         },
-                        "F3": function(cm) {
-                            findOnly();
+                        "F3": function() { 
+                            if(activeSearchMode === 'fuzzy') fuzzyFind();
+                            else findExact(); 
                         },
-                        "Ctrl-G": function(cm) {
-                            findOnly();
-                        },
-                        "Cmd-G": function(cm) {
-                            findOnly();
-                        },
-                        // INTERCEPT TOMBOL ENTER DI EDITOR 
+                        // SMART ENTER INTERCEPTOR
                         "Enter": function(cm) {
                             const selectedText = cm.getSelection();
-                            // Jika sedang menyeleksi kata yang persis sama dengan kata pencarian
-                            if (selectedText && selectedText === lastSearchTerm) {
-                                findOnly(); // Jalankan "Find Next" (jangan overwrite)
-                            } else {
-                                return CodeMirror.Pass; // Biarkan Enter berfungsi normal (buat baris baru)
+                            // Jika mode normal exact, biarkan enter mencari selanjutnya
+                            if (activeSearchMode === 'exact' && selectedText && selectedText === lastExactTerm) {
+                                findExact();
+                                return;
                             }
+                            // Jika sedang menyeleksi kata untuk Fuzzy, jalankan Fuzzy next
+                            if (activeSearchMode === 'fuzzy' && fuzzyResults.length > 0 && currentFuzzyIndex >= 0) {
+                                const activeMatch = fuzzyResults[currentFuzzyIndex];
+                                const selFrom = cm.getCursor("anchor");
+                                const selTo = cm.getCursor("head");
+                                const minLine = Math.min(selFrom.line, selTo.line);
+                                const maxLine = Math.max(selFrom.line, selTo.line);
+                                
+                                if (minLine >= activeMatch.from.line && maxLine <= activeMatch.to.line) {
+                                    fuzzyFind();
+                                    return; 
+                                }
+                            }
+                            return CodeMirror.Pass; // Enter normal
                         }
                     }
                 });
 
-                // Auto-save via CodeMirror changes
                 cmEditor.on('change', () => {
                     UI.saveStatus.innerText = "Menyimpan...";
                     clearTimeout(autoSaveTimeout);
                     autoSaveTimeout = setTimeout(() => {
-                        if(currentFileId) {
-                            updateExistingProject(currentFileId, cmEditor.getValue());
-                        }
+                        if(currentFileId) updateExistingProject(currentFileId, cmEditor.getValue());
                     }, 800); 
                 });
             }
 
-            // Set Editor content
             cmEditor.setValue(content);
-            setTimeout(() => cmEditor.refresh(), 50); // Mencegah glitch render
+            setTimeout(() => cmEditor.refresh(), 50); 
             UI.saveStatus.innerText = "Tersimpan di riwayat";
-            
-            // Force reset to Editor mode (Hide Preview)
             closePreview();
         };
 
@@ -477,9 +579,7 @@
             if (!file) return;
 
             const validExtensions = ['.html', '.htm', '.txt'];
-            const isValid = file.type === "text/html" || validExtensions.some(ext => file.name.toLowerCase().endsWith(ext));
-
-            if (isValid) {
+            if (file.type === "text/html" || validExtensions.some(ext => file.name.toLowerCase().endsWith(ext))) {
                 const reader = new FileReader();
                 reader.onload = (event) => {
                     saveNewProject(file.name, event.target.result);
@@ -492,14 +592,11 @@
             e.target.value = ''; 
         });
 
-        // --- Layout Toggles (Full Editor vs True Full Preview) ---
+        // --- Layout Toggles ---
         const openPreview = () => {
             isPreviewMode = true;
             UI.previewPanel.classList.remove('hidden');
-            
             refreshPreview(); 
-            
-            // Show ESC hint briefly
             const escHint = document.getElementById('esc-hint');
             escHint.style.opacity = '1';
             setTimeout(() => { escHint.style.opacity = '0'; }, 3500);
@@ -514,123 +611,141 @@
 
         const refreshPreview = () => {
             const content = cmEditor.getValue();
-            
-            // Inject script to detect ESC key even inside the iframe
             const injectedScript = `
                 <script>
                     document.addEventListener('keydown', function(e) {
-                        if (e.key === 'Escape') {
-                            window.parent.postMessage('close-preview', '*');
-                        }
+                        if (e.key === 'Escape') window.parent.postMessage('close-preview', '*');
                     });
                 <\/script>
             `;
-            
-            const finalContent = content + injectedScript;
-            const blob = new Blob([finalContent], { type: 'text/html' });
+            const blob = new Blob([content + injectedScript], { type: 'text/html' });
             UI.previewIframe.src = URL.createObjectURL(blob);
         };
 
-        // Esc key listener on the main window
         document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape' && isPreviewMode) {
-                closePreview();
-            }
+            if (e.key === 'Escape' && isPreviewMode) closePreview();
         });
-
-        // Listen for Esc key from inside the iframe
         window.addEventListener('message', (e) => {
-            if (e.data === 'close-preview' && isPreviewMode) {
-                closePreview();
-            }
+            if (e.data === 'close-preview' && isPreviewMode) closePreview();
         });
 
-
-        // --- Vibe Coding Tools (Search & Replace) ---
-        const triggerAutoSave = () => {
-            const content = cmEditor.getValue();
-            updateExistingProject(currentFileId, content);
-        };
-
-        const findOnly = () => {
+        // --- Pencarian Cepat Normal (Exact) ---
+        const findExact = () => {
             const searchTerm = UI.findInput.value;
             if (!searchTerm) return;
             
-            // Jika kata kunci berubah atau belum pernah dicari, mulai dari posisi kursor saat ini
-            if (searchTerm !== lastSearchTerm || !lastSearchCursor) {
-                lastSearchTerm = searchTerm;
-                lastSearchCursor = cmEditor.getSearchCursor(searchTerm, cmEditor.getCursor());
+            activeSearchMode = 'exact';
+
+            if (searchTerm !== lastExactTerm || !exactCursor) {
+                lastExactTerm = searchTerm;
+                exactCursor = cmEditor.getSearchCursor(searchTerm, cmEditor.getCursor());
             }
 
-            // Cari kemunculan selanjutnya (Find Next)
-            if (!lastSearchCursor.findNext()) {
-                // Jika sudah mentok ke bawah, mulai lagi pencarian dari paling atas (Wrap around)
-                lastSearchCursor = cmEditor.getSearchCursor(searchTerm);
-                if (!lastSearchCursor.findNext()) {
-                    showToast("Kode tidak ditemukan");
-                    UI.searchStatus.innerText = "0 hasil";
+            if (!exactCursor.findNext()) {
+                exactCursor = cmEditor.getSearchCursor(searchTerm);
+                if (!exactCursor.findNext()) {
+                    showToast("Kode persis tidak ditemukan.");
+                    UI.searchStatus.innerText = "0 Hasil (Exact)";
                     return;
                 }
-                showToast("Kembali mencari ke atas dokumen");
+                showToast("Mencari ke atas dokumen (Exact)");
             }
 
-            // Highlight baris dan pindahkan fokus ke editor agar teks bisa langsung ditimpa (overwrite) dengan Paste
-            cmEditor.setSelection(lastSearchCursor.from(), lastSearchCursor.to());
-            cmEditor.scrollIntoView({from: lastSearchCursor.from(), to: lastSearchCursor.to()}, 100);
-            UI.searchStatus.innerText = `Di baris ${lastSearchCursor.from().line + 1}`;
-            cmEditor.focus(); // <-- Fokus di editor sehingga Ctrl+V (Paste) bisa langsung me-replace
+            cmEditor.setSelection(exactCursor.from(), exactCursor.to());
+            cmEditor.scrollIntoView({from: exactCursor.from(), to: exactCursor.to()}, 100);
+            UI.searchStatus.innerText = `Baris ${exactCursor.from().line + 1} (Exact)`;
+            cmEditor.focus(); 
+        };
+
+        // --- Pencarian Halusinasi AI (Fuzzy) ---
+        const fuzzyFind = () => {
+            const searchTerm = UI.findInput.value;
+            if (!searchTerm) return;
+            
+            activeSearchMode = 'fuzzy';
+
+            if (searchTerm !== lastFuzzyTerm || fuzzyResults.length === 0) {
+                lastFuzzyTerm = searchTerm;
+                buildFuzzyResults(searchTerm);
+                currentFuzzyIndex = -1;
+            }
+
+            if (fuzzyResults.length === 0) {
+                showToast("Tidak ada kode yang mirip (>45%).");
+                UI.searchStatus.innerText = "0 Hasil (Fuzzy)";
+                return;
+            }
+
+            currentFuzzyIndex = (currentFuzzyIndex + 1) % fuzzyResults.length;
+            const match = fuzzyResults[currentFuzzyIndex];
+
+            const simText = Math.round(match.score * 100) + '%';
+            UI.searchStatus.innerText = `${currentFuzzyIndex + 1}/${fuzzyResults.length} (Mirip: ${simText})`;
+
+            cmEditor.setSelection(match.from, match.to);
+            cmEditor.scrollIntoView({from: match.from, to: match.to}, 100);
+            cmEditor.focus();
+        };
+
+        const triggerAutoSave = () => {
+            if(currentFileId) updateExistingProject(currentFileId, cmEditor.getValue());
         };
 
         const replaceAll = () => {
-            const findText = UI.findInput.value;
             const replaceText = UI.replaceInput.value;
             
-            if (!findText) return;
-            
-            let count = 0;
-            // Optimasi: Gunakan cmEditor.operation untuk mencegah re-render per baris (Performa & Undo Aman)
-            cmEditor.operation(() => {
-                const cursor = cmEditor.getSearchCursor(findText);
-                while (cursor.findNext()) {
-                    cursor.replace(replaceText);
-                    count++;
-                }
-            });
-            
-            if(count > 0) {
-                showToast(`${count} perubahan dilakukan`);
-                UI.searchStatus.innerText = `${count} diganti`;
-                triggerAutoSave();
+            if (activeSearchMode === 'exact') {
+                const findText = UI.findInput.value;
+                if (!findText) return;
+                let count = 0;
+                cmEditor.operation(() => {
+                    const cursor = cmEditor.getSearchCursor(findText);
+                    while (cursor.findNext()) { cursor.replace(replaceText); count++; }
+                });
+                if(count > 0) { showToast(`${count} diganti (Exact)`); UI.searchStatus.innerText = `${count} Diganti`; triggerAutoSave(); }
+                else showToast("Teks persis tidak ditemukan.");
             } else {
-                showToast("Teks yang dicari tidak ditemukan.");
+                // Fuzzy Replace
+                if (!lastFuzzyTerm || fuzzyResults.length === 0) return;
+                const sortedMatches = [...fuzzyResults].sort((a, b) => b.from.line - a.from.line);
+                cmEditor.operation(() => {
+                    for (let match of sortedMatches) cmEditor.replaceRange(replaceText, match.from, match.to);
+                });
+                showToast(`${sortedMatches.length} blok kemiripan diganti`);
+                UI.searchStatus.innerText = "Fuzzy Diganti";
+                triggerAutoSave();
+                lastFuzzyTerm = ""; fuzzyResults = [];
             }
         };
 
         const deleteFound = () => {
-            const findText = UI.findInput.value;
-            if (!findText) return;
-            
-            let removedCount = 0;
-            
-            // BOTTLENECK FIX: Menghapus setValue() yang mere-render seluruh layar. 
-            // Loop berjalan mundur agar index baris tidak berantakan saat dihapus di tengah jalan.
-            cmEditor.operation(() => {
-                const linesCount = cmEditor.lineCount();
-                for (let i = linesCount - 1; i >= 0; i--) {
-                    const lineText = cmEditor.getLine(i);
-                    if (lineText.includes(findText)) {
-                        cmEditor.replaceRange("", {line: i, ch: 0}, {line: i + 1, ch: 0});
-                        removedCount++;
+            if (activeSearchMode === 'exact') {
+                const findText = UI.findInput.value;
+                if (!findText) return;
+                let removedCount = 0;
+                cmEditor.operation(() => {
+                    const linesCount = cmEditor.lineCount();
+                    for (let i = linesCount - 1; i >= 0; i--) {
+                        if (cmEditor.getLine(i).includes(findText)) {
+                            cmEditor.replaceRange("", {line: i, ch: 0}, {line: i + 1, ch: 0});
+                            removedCount++;
+                        }
                     }
-                }
-            });
-            
-            if(removedCount > 0) {
-                showToast(`${removedCount} baris dihapus`);
-                UI.searchStatus.innerText = `-${removedCount} baris`;
-                triggerAutoSave();
+                });
+                if(removedCount > 0) { showToast(`${removedCount} baris dihapus`); triggerAutoSave(); }
             } else {
-                 showToast("Tidak ada baris yang mengandung teks tersebut.");
+                // Fuzzy Delete
+                if (!lastFuzzyTerm || fuzzyResults.length === 0) return;
+                const sortedMatches = [...fuzzyResults].sort((a, b) => b.from.line - a.from.line);
+                cmEditor.operation(() => {
+                    for (let match of sortedMatches) {
+                        // Hapus block secara penuh
+                        cmEditor.replaceRange("", {line: match.from.line, ch: 0}, {line: match.to.line + 1, ch: 0});
+                    }
+                });
+                showToast(`${sortedMatches.length} blok kemiripan dihapus`);
+                triggerAutoSave();
+                lastFuzzyTerm = ""; fuzzyResults = [];
             }
         };
 

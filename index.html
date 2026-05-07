@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Aura HTML - Workspace</title>
+    <title> Echti Em Eel - Workspace</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
     
@@ -15,6 +15,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/mode/css/css.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/mode/htmlmixed/htmlmixed.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/addon/search/searchcursor.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jsdiff/5.1.0/diff.min.js"></script>
     <style>
         :root {
             --md-bg: #f8f9fa;
@@ -95,7 +96,7 @@
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
                     </svg>
                 </div>
-                <h1 class="text-lg font-semibold tracking-tight">Aura</h1>
+                <h1 class="text-lg font-semibold tracking-tight">Echti Em Eel</h1>
             </div>
         </div>
         
@@ -142,8 +143,8 @@
                     <!-- Kiri: Copywriting & Actions -->
                     <div class="flex-1 flex flex-col justify-center items-start max-w-2xl z-10">
                         <div class="mb-12 mt-4 lg:mt-0">
-                            <h2 class="text-4xl md:text-5xl font-bold text-black tracking-tight leading-tight mb-4">Ruang Kedap Suara<br>Untuk Naskah Anda.</h2>
-                            <p class="text-gray-500 text-lg font-light tracking-wide max-w-lg leading-relaxed">Setiap baris kode adalah dialog, dan Anda sutradaranya. Mari ciptakan karya berikutnya.</p>
+                            <h2 class="text-4xl md:text-5xl font-bold text-black tracking-tight leading-tight mb-4">Azzalkaff HTML Viewer<br></h2>
+                            <p class="text-gray-500 text-lg font-light tracking-wide max-w-lg leading-relaxed">Yang buat appnya ganteng</p>
                         </div>
                         
                         <div class="flex flex-col sm:flex-row gap-6 justify-start w-full">
@@ -154,8 +155,8 @@
                                     <div class="w-12 h-12 bg-green-50 rounded-full flex items-center justify-center group-hover:bg-[#5c8d42] group-hover:text-white text-[#5c8d42] transition-colors duration-300 mb-8">
                                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" /></svg>
                                     </div>
-                                    <span class="block text-xl font-bold text-gray-800 mb-2 group-hover:text-[#5c8d42] transition-colors tracking-tight">Lembaran Baru</span>
-                                    <span class="text-sm text-gray-500 leading-relaxed font-light block">Kanvas putih menanti goresan pertama dari imajinasi Anda.</span>
+                                    <span class="block text-xl font-bold text-gray-800 mb-2 group-hover:text-[#5c8d42] transition-colors tracking-tight">Create New HTML</span>
+                                    <span class="text-sm text-gray-500 leading-relaxed font-light block">Silakan cantumkan web yang ingin anda edit.</span>
                                 </div>
                             </button>
 
@@ -167,8 +168,8 @@
                                     <div class="w-12 h-12 bg-green-50 rounded-full flex items-center justify-center group-hover:bg-[#5c8d42] group-hover:text-white text-[#5c8d42] transition-colors duration-300 mb-8">
                                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" /></svg>
                                     </div>
-                                    <span class="block text-xl font-bold text-gray-800 mb-2 group-hover:text-[#5c8d42] transition-colors tracking-tight">Lanjutkan Cerita</span>
-                                    <span class="text-sm text-gray-500 leading-relaxed font-light block">Bangkitkan kembali karya indah yang sempat tertunda.</span>
+                                    <span class="block text-xl font-bold text-gray-800 mb-2 group-hover:text-[#5c8d42] transition-colors tracking-tight">Add HTML file</span>
+                                    <span class="text-sm text-gray-500 leading-relaxed font-light block">Ambil saja bosku.</span>
                                 </div>
                             </button>
                         </div>
@@ -276,7 +277,10 @@
                                 
                                 <div class="w-px h-6 bg-gray-200 mx-1"></div>
                                 
-                                <button onclick="replaceAll()" class="px-4 py-1.5 bg-[#5c8d42] hover:bg-[#4a7235] text-white rounded-md text-sm font-medium transition shadow-sm">Replace All</button>
+                                <button onclick="reviewReplacements()" class="px-4 py-1.5 bg-[#5c8d42] hover:bg-[#4a7235] text-white rounded-md text-sm font-medium transition shadow-sm flex items-center gap-2" title="Review perubahan sebelum diterapkan (Smart Replace)">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                    Review Replace
+                                </button>
                                 <button onclick="deleteFound()" class="px-4 py-1.5 bg-transparent border border-red-200 hover:bg-red-50 text-red-600 rounded-md text-sm font-medium transition">Find & Delete</button>
                             </div>
                             <div id="search-status" class="whitespace-nowrap text-xs text-gray-600 font-medium px-2 py-1 bg-gray-200 rounded">0 Hasil</div>
@@ -987,30 +991,152 @@ if(device === 'mobile') {
             if(currentFileId) updateExistingProject(currentFileId, cmEditor.getValue());
         };
 
-        const replaceAll = () => {
+        // --- Smart Replace & Unified Diff Logic ---
+        let pendingReplacements = [];
+        let resolvedChanges = 0;
+
+        const reviewReplacements = () => {
             const replaceText = UI.replaceInput.value;
-            
+            const findText = UI.findInput.value;
+            pendingReplacements = [];
+
+            // 1. Kumpulkan semua blok yang akan direplace
             if (activeSearchMode === 'exact') {
-                const findText = UI.findInput.value;
-                if (!findText) return;
-                let count = 0;
-                cmEditor.operation(() => {
-                    const cursor = cmEditor.getSearchCursor(findText);
-                    while (cursor.findNext()) { cursor.replace(replaceText); count++; }
+                if (!findText) return showToast("Pencarian kosong!");
+                const cursor = cmEditor.getSearchCursor(findText);
+                while (cursor.findNext()) {
+                    pendingReplacements.push({ from: cursor.from(), to: cursor.to() });
+                }
+            } else { // Fuzzy Mode
+                if (!lastFuzzyTerm || fuzzyResults.length === 0) return showToast("Pencarian Fuzzy kosong!");
+                // Map object untuk menghindari referensi mutasi
+                pendingReplacements = fuzzyResults.map(m => ({ from: m.from, to: m.to }));
+            }
+
+            if (pendingReplacements.length === 0) {
+                showToast("Tidak ada kecocokan kode untuk di-replace.");
+                return;
+            }
+
+            // 2. URUTKAN DARI BAWAH KE ATAS (Sangat Krusial!)
+            // Mengubah baris di bawah tidak akan merusak nomor baris (koordinat) di atasnya
+            pendingReplacements.sort((a, b) => b.from.line - a.from.line);
+            
+            resolvedChanges = 0;
+            renderDiffModal(replaceText);
+        };
+
+        const renderDiffModal = (replaceText) => {
+            const container = document.getElementById('diff-blocks-container');
+            container.innerHTML = '';
+            UI.searchStatus.innerText = `${pendingReplacements.length} Antrean Replace`;
+            document.getElementById('diff-status-text').innerText = `1 / ${pendingReplacements.length} Blok Tertunda`;
+
+            pendingReplacements.forEach((match, index) => {
+                // Ambil konteks 3 baris ke atas dan 3 baris ke bawah
+                const startLine = Math.max(0, match.from.line - 3);
+                const endLine = Math.min(cmEditor.lineCount() - 1, match.to.line + 3);
+                
+                // Ambil teks asli secara utuh (Konteks + Teks Lama + Konteks)
+                const oldTextFull = cmEditor.getRange({line: startLine, ch: 0}, {line: endLine, ch: cmEditor.getLine(endLine).length});
+
+                // Buat simulasi teks baru (Konteks + Teks Baru + Konteks)
+                const textBeforeMatch = cmEditor.getRange({line: startLine, ch: 0}, match.from);
+                const textAfterMatch = cmEditor.getRange(match.to, {line: endLine, ch: cmEditor.getLine(endLine).length});
+                const newTextFull = textBeforeMatch + replaceText + textAfterMatch;
+
+                // Eksekusi JsDiff
+                const diffParts = Diff.diffLines(oldTextFull, newTextFull);
+                let diffHtml = '';
+
+                diffParts.forEach(part => {
+                    const isAdded = part.added;
+                    const isRemoved = part.removed;
+                    const colorClass = isAdded ? 'bg-green-100 text-green-900 border-l-4 border-green-500' : 
+                                       isRemoved ? 'bg-red-100 text-red-900 border-l-4 border-red-500 line-through decoration-red-400 decoration-1 opacity-80' : 
+                                       'text-gray-500 bg-transparent border-l-4 border-transparent';
+                    
+                    const prefix = isAdded ? '+ ' : isRemoved ? '- ' : '  ';
+                    
+                    // Hindari render tag HTML di dalam Modal
+                    const escapedValue = part.value.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+                    
+                    // Render baris
+                    if(escapedValue.trim() !== "" || part.value.includes('\n')) {
+                        diffHtml += `<div class="whitespace-pre-wrap font-mono text-[13px] leading-relaxed px-4 py-0.5 ${colorClass}">${prefix}${escapedValue}</div>`;
+                    }
                 });
-                if(count > 0) { showToast(`${count} diganti (Exact)`); UI.searchStatus.innerText = `${count} Diganti`; triggerAutoSave(); }
-                else showToast("Teks persis tidak ditemukan.");
-            } else {
-                // Fuzzy Replace
-                if (!lastFuzzyTerm || fuzzyResults.length === 0) return;
-                const sortedMatches = [...fuzzyResults].sort((a, b) => b.from.line - a.from.line);
-                cmEditor.operation(() => {
-                    for (let match of sortedMatches) cmEditor.replaceRange(replaceText, match.from, match.to);
-                });
-                showToast(`${sortedMatches.length} blok kemiripan diganti`);
-                UI.searchStatus.innerText = "Fuzzy Diganti";
-                triggerAutoSave();
-                lastFuzzyTerm = ""; fuzzyResults = [];
+
+                container.innerHTML += `
+                    <div id="diff-block-${index}" class="bg-white border border-gray-200 rounded-xl overflow-hidden shadow-sm transition-all duration-300">
+                        <div class="bg-gray-50 px-5 py-3 border-b border-gray-200 flex justify-between items-center">
+                            <span class="text-xs font-bold text-gray-500 uppercase tracking-widest">Baris ${match.from.line + 1} &rarr; ${match.to.line + 1}</span>
+                            <div class="flex gap-2.5">
+                                <button onclick="skipChange(${index})" class="px-4 py-1.5 text-xs font-bold text-gray-600 bg-white border border-gray-300 rounded-md hover:bg-gray-100 hover:text-black transition">Lewati (Skip)</button>
+                                <button onclick="applyChange(${index}, \`${encodeURIComponent(replaceText)}\`)" class="flex items-center gap-1.5 px-4 py-1.5 text-xs font-bold text-white bg-[#5c8d42] hover:bg-[#4a7235] rounded-md transition shadow-sm">
+                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                                    Terima (Apply)
+                                </button>
+                            </div>
+                        </div>
+                        <div class="overflow-x-auto bg-white py-2">
+                            ${diffHtml}
+                        </div>
+                    </div>
+                `;
+            });
+
+            document.getElementById('diff-review-modal').classList.remove('hidden');
+        };
+
+        const applyChange = (index, encodedReplaceText) => {
+            const replaceText = decodeURIComponent(encodedReplaceText);
+            const match = pendingReplacements[index];
+            
+            // Terapkan ke Editor CodeMirror
+            cmEditor.operation(() => {
+                cmEditor.replaceRange(replaceText, match.from, match.to);
+            });
+            
+            // Update UI
+            const block = document.getElementById(`diff-block-${index}`);
+            block.style.opacity = '0.5';
+            block.style.pointerEvents = 'none';
+            block.querySelector('.bg-gray-50').innerHTML = `<span class="text-xs font-bold text-green-600 px-2 uppercase tracking-widest flex items-center gap-1"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> Berhasil Diterapkan</span>`;
+            
+            triggerAutoSave();
+            checkAllResolved();
+        };
+
+        const skipChange = (index) => {
+            const block = document.getElementById(`diff-block-${index}`);
+            block.style.opacity = '0.4';
+            block.style.pointerEvents = 'none';
+            block.querySelector('.bg-gray-50').innerHTML = `<span class="text-xs font-bold text-gray-400 px-2 uppercase tracking-widest">Dilewati</span>`;
+            
+            checkAllResolved();
+        };
+
+        const checkAllResolved = () => {
+            resolvedChanges++;
+            const sisa = pendingReplacements.length - resolvedChanges;
+            document.getElementById('diff-status-text').innerText = sisa > 0 ? `${sisa} Blok Tersisa` : `Semua Selesai`;
+            
+            if (sisa === 0) {
+                setTimeout(() => {
+                    closeDiffModal();
+                    showToast("Semua antrean modifikasi selesai.");
+                }, 800);
+            }
+        };
+
+        const closeDiffModal = () => {
+            document.getElementById('diff-review-modal').classList.add('hidden');
+            pendingReplacements = [];
+            resolvedChanges = 0;
+            if(activeSearchMode === 'fuzzy') {
+                lastFuzzyTerm = ""; 
+                fuzzyResults = [];
             }
         };
 

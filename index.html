@@ -2,7 +2,7 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0f">
     <title> Echti Em Eel - Workspace</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
@@ -237,6 +237,15 @@
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 012-2h2a2 2 0 012 2" /></svg>
                         Inspector
                     </button>
+                    <div class="flex items-center gap-2 px-2 py-1 bg-gray-50 rounded-lg border border-gray-100">
+                        <button onclick="toggleSound()" class="flex items-center p-1 text-gray-600 hover:text-black rounded transition" title="Mute/Unmute SFX">
+                            <span id="sound-icon">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072M17.657 6.343a8 8 0 010 11.314M11 5L6 9H2v6h4l5 4V5z" /></svg>
+                            </span>
+                        </button>
+                        <input type="range" id="sound-volume" min="0" max="1" step="0.05" value="0.5" oninput="updateVolume(this.value)" class="w-16 h-1 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-green-600" title="Atur Volume SFX">
+                    </div>
+                    <div class="w-px h-5 bg-gray-200 my-auto mx-1"></div>
                     <button onclick="splitSoC()" class="flex items-center gap-2 px-4 py-2 bg-transparent text-gray-600 hover:text-black hover:bg-gray-50 rounded-lg text-sm transition font-medium" title="Split into HTML, JS, CSS">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7" /></svg>
                         Split SoC
@@ -281,9 +290,36 @@
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                                     Review Replace
                                 </button>
-                                <button onclick="deleteFound()" class="px-4 py-1.5 bg-transparent border border-red-200 hover:bg-red-50 text-red-600 rounded-md text-sm font-medium transition">Find & Delete</button>
-                            </div>
+<button onclick="deleteFound()" class="px-4 py-1.5 bg-transparent border border-red-200 hover:bg-red-50 text-red-600 rounded-md text-sm font-medium transition">Find & Delete</button>
+                                
+                                <div class="w-px h-6 bg-gray-200 mx-1"></div>
+                                <button onclick="toggleGitPatchPanel()" id="btn-toggle-patch" class="px-4 py-1.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 rounded-md text-sm font-medium transition shadow-sm">Buka Git Patch</button>
+                            </div>
                             <div id="search-status" class="whitespace-nowrap text-xs text-gray-600 font-medium px-2 py-1 bg-gray-200 rounded">0 Hasil</div>
+                        </div>
+                    </div>
+<div id="git-patch-panel" class="hidden p-3 bg-slate-50 border-b flex-col gap-2 shrink-0 shadow-sm border-t border-slate-200 transition-all duration-300">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-slate-500">
+                                <svg class="w-3.5 h-3.5 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7v8a2 2 0 002 2h6M8 7a2 2 0 114 0v8a2 2 0 01-2 2H8m0-10V4m0 11v4"></path></svg>
+                                Smart Git Patch Integrator (Fuzzy Enabled)
+                            </div>
+                            <span class="text-[10px] bg-indigo-100 text-indigo-700 font-bold px-2 py-0.5 rounded shadow-sm">AI-Immune</span>
+                        </div>
+                        <div class="w-full">
+                            <textarea id="git-diff-input" rows="2" placeholder="Tempel potongan kode Git Diff / Unified Patch dari Chatbot ke sini (Mendukung simbol @@, +, -)..." class="w-full px-3 py-2 border border-slate-300 rounded text-xs code-font focus:ring-2 focus:ring-indigo-400 outline-none resize-y" spellcheck="false"></textarea>
+                        </div>
+                        <div class="flex justify-between items-center mt-0.5">
+                            <button onclick="reviewGitPatch()" class="px-4 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-md text-xs font-semibold transition shadow-sm flex items-center gap-1.5">
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 012-2h2a2 2 0 012 2"></path></svg>
+                                Review & Apply Git Patch
+                            </button>
+                            <div class="flex items-center gap-2">
+                                <button id="btn-show-preview-patch" onclick="document.getElementById('diff-review-modal').classList.remove('hidden')" class="hidden px-3 py-1 bg-[#5c8d42] hover:bg-[#4a7235] text-white rounded text-[11px] font-bold transition shadow-sm">
+                                    Buka Preview
+                                </button>
+                                <div id="git-patch-status" class="whitespace-nowrap text-[11px] text-slate-500 font-medium px-2 py-0.5 bg-slate-200 rounded">Ready</div>
+                            </div>
                         </div>
                     </div>
                     
@@ -365,6 +401,31 @@
     </div>
 
     <!-- Notification Toast -->
+    <div id="diff-review-modal" class="fixed inset-0 bg-gray-900/60 z-[160] hidden flex items-center justify-center p-4 backdrop-blur-sm">
+        <div class="bg-white rounded-2xl w-full max-w-4xl shadow-2xl flex flex-col max-h-[85vh]">
+            <div class="px-6 py-4 border-b flex justify-between items-center bg-gray-50 rounded-t-2xl">
+                <h3 class="text-md font-bold text-gray-800 flex items-center gap-2">
+                    Review Perubahan Kode (Git Diff Style)
+                </h3>
+                <button onclick="closeDiffModal()" class="text-gray-400 hover:text-red-500 transition">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+            </div>
+            <div class="p-6 overflow-y-auto flex flex-col gap-4 bg-gray-50 flex-1" id="diff-blocks-container">
+<div class="px-6 py-4 border-t flex justify-between items-center bg-gray-50 rounded-b-2xl">
+                <span id="diff-status-text" class="text-sm font-medium text-gray-500">0 Blok Tertunda</span>
+                <div class="flex items-center gap-3">
+                    <button onclick="applyAllPendingChanges()" class="px-5 py-2 bg-[#5c8d42] hover:bg-[#4a7235] text-white rounded-lg text-sm font-bold transition shadow-md flex items-center gap-2">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7M5 19l4 4L19 13" opacity="0.5"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                        Terima Semua (Apply All)
+                    </button>
+                    <button onclick="closeDiffModal()" class="px-5 py-2 bg-gray-800 text-white rounded-lg text-sm hover:bg-black transition">Tutup</button>
+                </div>
+            </div>
+            </div>
+        </div>
+    </div>
+
     <div id="toast" class="fixed bottom-8 left-1/2 transform -translate-x-1/2 bg-gray-800 text-white px-6 py-3 rounded-full shadow-2xl opacity-0 transition-opacity duration-300 pointer-events-none z-50 font-medium">
         Message goes here
     </div>
@@ -378,6 +439,66 @@
         let autoSaveTimeout = null;
         let cmEditor = null; 
         let isInspectorOpen = false;
+        
+        // --- Sistem Audio Inline (Web Audio API dengan Matematika Frekuensi) ---
+        let isSoundEnabled = true;
+        let globalVolumeModifier = 0.5; // Nilai default volume (50%)
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        
+        const updateVolume = (val) => {
+            globalVolumeModifier = parseFloat(val);
+            if (globalVolumeModifier === 0) {
+                isSoundEnabled = false;
+                document.getElementById('sound-icon').innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" stroke-linecap="round" stroke-linejoin="round"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2"/></svg>`;
+            } else {
+                if (!isSoundEnabled) {
+                    isSoundEnabled = true;
+                    document.getElementById('sound-icon').innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072M17.657 6.343a8 8 0 010 11.314M11 5L6 9H2v6h4l5 4V5z" /></svg>`;
+                }
+                playClickSound(); // Berikan feedback suara instan saat menggeser volume
+            }
+        };
+        
+        const playSatisfyingPop = () => {
+            if (!isSoundEnabled) return;
+            // Resume context jika browser melakukan auto-suspend
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+            
+            const osc = audioCtx.createOscillator();
+            const gainNode = audioCtx.createGain();
+            
+            // Matematika kurva eksponensial untuk suara 'soft pop' yang satisfying
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(800, audioCtx.currentTime);
+            osc.frequency.exponentialRampToValueAtTime(100, audioCtx.currentTime + 0.1);
+            
+            const calculatedVolume = vol * globalVolumeModifier;
+            gainNode.gain.setValueAtTime(calculatedVolume > 0 ? calculatedVolume : 0.001, audioCtx.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
+            
+            osc.connect(gainNode);
+            gainNode.connect(audioCtx.destination);
+            
+            osc.start();
+            osc.stop(audioCtx.currentTime + 0.1);
+        };
+
+        const toggleSound = () => {
+            isSoundEnabled = !isSoundEnabled;
+            const icon = document.getElementById('sound-icon');
+            const slider = document.getElementById('sound-volume');
+            if (isSoundEnabled) {
+                if (globalVolumeModifier === 0) globalVolumeModifier = 0.5; // Kembalikan ke 50% jika sebelumnya 0
+                slider.value = globalVolumeModifier;
+                icon.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072M17.657 6.343a8 8 0 010 11.314M11 5L6 9H2v6h4l5 4V5z" /></svg>`;
+                playSatisfyingPop();
+                showToast("Efek Suara: AKTIF");
+            } else {
+                slider.value = 0;
+                icon.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" stroke-linecap="round" stroke-linejoin="round"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2"/></svg>`;
+                showToast("Efek Suara: MATI");
+            }
+        };
         
         // --- Utility: High-Performance Debounce ---
         const debounce = (fn, delay) => {
@@ -457,9 +578,10 @@
         };
 
         // --- Algoritma Fuzzy Search Prioritas (Toleransi Typo & Halusinasi AI) ---
-        const calculateSimilarity = (str1, str2) => {
-            const s1 = str1.replace(/\s+/g, '').toLowerCase();
-            const s2 = str2.replace(/\s+/g, '').toLowerCase();
+// str1 sudah di-preprocess (dibersihkan) sebelum masuk fungsi ini untuk menghemat memori & CPU
+        const calculateSimilarity = (str1Cleaned, str2) => {
+            const s1 = str1Cleaned;
+            const s2 = str2.replace(/\s+/g, '').toLowerCase();
             
             if (s1 === s2) return 1.0;
             if (s1.length < 2 || s2.length < 2) return s1 === s2 ? 1.0 : 0.0;
@@ -480,23 +602,28 @@
             }
             return (2.0 * intersection) / ((s1.length - 1) + (s2.length - 1));
         };
-
-        const buildFuzzyResults = (searchText) => {
-            fuzzyResults = [];
-            const docLines = cmEditor.getValue().split('\n');
-            const queryLines = searchText.split('\n');
-            const N = queryLines.length;
-
-            const tempMatches = [];
-            // Buat sliding window dinamis jika AI menghilangkan atau menambah beberapa baris
-            const windowSizes = [N - 2, N - 1, N, N + 1, N + 2].filter(w => w > 0);
+const buildFuzzyResults = (searchText) => {
+            fuzzyResults = [];
+            const docLines = cmEditor.getValue().split('\n');
+            const queryLines = searchText.split('\n');
+            const N = queryLines.length;
             
-            for (let i = 0; i < docLines.length; i++) {
-                for (let w of windowSizes) {
-                    if (i + w > docLines.length) continue;
-                    
-                    const windowText = docLines.slice(i, i + w).join('\n');
-                    const score = calculateSimilarity(searchText, windowText);
+            // Optimasi 1: Bersihkan spasi pada query di luar loop
+            const cleanSearchText = searchText.replace(/\s+/g, '').toLowerCase();
+
+            const tempMatches = [];
+            // Optimasi 2: Pastikan window terkecil tidak 0 dan cover pencarian 1 baris
+            const windowSizes = N === 1 ? [1, 2] : [N - 2, N - 1, N, N + 1, N + 2].filter(w => w > 0);
+            
+            for (let i = 0; i < docLines.length; i++) {
+                // FAST SKIP: Lewati blok kosong untuk performa
+                if (docLines[i].trim() === "") continue; 
+
+                for (let w of windowSizes) {
+                    if (i + w > docLines.length) continue;
+                    
+                    const windowText = docLines.slice(i, i + w).join('\n');
+                    const score = calculateSimilarity(cleanSearchText, windowText);
                     
                     // Toleransi minimal kemiripan > 45% untuk dianggap kandidat
                     if (score > 0.45) {
@@ -830,9 +957,29 @@ if(device === 'mobile') {
                 outerContainer.classList.remove('p-8');
             }
         };
+const toggleGitPatchPanel = () => {
+            const panel = document.getElementById('git-patch-panel');
+            const btn = document.getElementById('btn-toggle-patch');
+            
+            if (panel.classList.contains('hidden')) {
+                panel.classList.remove('hidden');
+                panel.classList.add('flex');
+                btn.innerText = "Tutup Git Patch";
+                btn.classList.replace('bg-indigo-50', 'bg-indigo-600');
+                btn.classList.replace('text-indigo-700', 'text-white');
+            } else {
+                panel.classList.add('hidden');
+                panel.classList.remove('flex');
+                btn.innerText = "Buka Git Patch";
+                btn.classList.replace('bg-indigo-600', 'bg-indigo-50');
+                btn.classList.replace('text-white', 'text-indigo-700');
+            }
+            // Refresh instance CodeMirror agar canvas me-resize ukurannya sendiri
+            setTimeout(() => cmEditor.refresh(), 150);
+        };
 
-        const toggleInspector = () => {
-            isInspectorOpen = !isInspectorOpen;
+        const toggleInspector = () => {
+            isInspectorOpen = !isInspectorOpen;
             if(isInspectorOpen) {
                 document.getElementById('workspace-container').classList.add('inspector-active');
                 updateDOMTree();
@@ -930,11 +1077,14 @@ if(device === 'mobile') {
         });
 
         // --- Pencarian Cepat Normal (Exact) ---
-        const findExact = () => {
-            const searchTerm = UI.findInput.value;
-            if (!searchTerm) return;
-            
-            activeSearchMode = 'exact';
+const findExact = () => {
+            let searchTerm = UI.findInput.value;
+            if (!searchTerm) return;
+            
+            // Optimasi: Normalisasi CRLF ke LF agar pencarian multiline tidak gagal
+            searchTerm = searchTerm.replace(/\r\n/g, '\n');
+            
+            activeSearchMode = 'exact';
 
             if (searchTerm !== lastExactTerm || !exactCursor) {
                 lastExactTerm = searchTerm;
@@ -995,22 +1145,25 @@ if(device === 'mobile') {
         let pendingReplacements = [];
         let resolvedChanges = 0;
 
+        // Fitur 1: Review Standar Pencarian (Search & Replace Atas)
         const reviewReplacements = () => {
             const replaceText = UI.replaceInput.value;
             const findText = UI.findInput.value;
             pendingReplacements = [];
 
-            // 1. Kumpulkan semua blok yang akan direplace
             if (activeSearchMode === 'exact') {
                 if (!findText) return showToast("Pencarian kosong!");
                 const cursor = cmEditor.getSearchCursor(findText);
                 while (cursor.findNext()) {
-                    pendingReplacements.push({ from: cursor.from(), to: cursor.to() });
+                    const marker = cmEditor.markText(cursor.from(), cursor.to(), { className: "pending-diff-marker" });
+                    pendingReplacements.push({ marker, originalFrom: cursor.from(), originalTo: cursor.to() });
                 }
-            } else { // Fuzzy Mode
+            } else { 
                 if (!lastFuzzyTerm || fuzzyResults.length === 0) return showToast("Pencarian Fuzzy kosong!");
-                // Map object untuk menghindari referensi mutasi
-                pendingReplacements = fuzzyResults.map(m => ({ from: m.from, to: m.to }));
+                pendingReplacements = fuzzyResults.map(m => {
+                    const marker = cmEditor.markText(m.from, m.to, { className: "pending-diff-marker" });
+                    return { marker, originalFrom: m.from, originalTo: m.to };
+                });
             }
 
             if (pendingReplacements.length === 0) {
@@ -1018,34 +1171,176 @@ if(device === 'mobile') {
                 return;
             }
 
-            // 2. URUTKAN DARI BAWAH KE ATAS (Sangat Krusial!)
-            // Mengubah baris di bawah tidak akan merusak nomor baris (koordinat) di atasnya
-            pendingReplacements.sort((a, b) => b.from.line - a.from.line);
-            
+            pendingReplacements.sort((a, b) => b.originalFrom.line - a.originalFrom.line);
             resolvedChanges = 0;
             renderDiffModal(replaceText);
         };
 
+        // Fitur 2: Blok Baru Khusus Ekstraksi Struktur Format Git Patch Mandiri dengan Mekanisme Kebal Halusinasi AI
+        const reviewGitPatch = () => {
+            const patchText = document.getElementById('git-diff-input').value;
+            const statusEl = document.getElementById('git-patch-status');
+            
+            // --- PRE-CHECK ERROR HANDLING 1: Input Area Kosong ---
+            if (!patchText.trim()) {
+                statusEl.className = "whitespace-nowrap text-[11px] text-red-600 font-bold px-2 py-0.5 bg-red-100 rounded";
+                statusEl.innerText = "Error: Input Kosong";
+                alert("⚠️ BOTTLENECK DETECTED: INPUT AREA KOSONG!\n\nAnda belum menempelkan kode Git Diff apa pun dari chatbot ke dalam text area.");
+                return;
+            }
+            
+            pendingReplacements = [];
+            const lines = patchText.split('\n');
+            let oldLines = [];
+            let newLines = [];
+            let inHunk = false;
+            
+            // Variabel Tracker untuk Diagnostik Pembacaan
+            let totalHunksFound = 0;
+            let exactMatches = 0;
+            let fuzzyMatches = 0;
+            let failedMatches = 0;
+            let diagnosticLog = [];
+
+            const locateAndPushHunk = (oldStr, newStr, hunkIndex) => {
+                if (!oldStr.trim() && !newStr.trim()) return;
+                totalHunksFound++;
+                
+                // Normalisasi LF/CRLF agar pencarian eksak tidak gagal
+                const normalizedOldStr = oldStr.replace(/\r\n/g, '\n');
+                
+                let cursor = cmEditor.getSearchCursor(normalizedOldStr);
+                if (cursor.findNext()) {
+                    // Gunakan TextMarker agar posisi tetap terlacak jika baris lain berubah
+                    const marker = cmEditor.markText(cursor.from(), cursor.to(), { className: "pending-diff-marker" });
+                    pendingReplacements.push({ marker, hunkReplaceText: newStr, originalFrom: cursor.from(), originalTo: cursor.to() });
+                    exactMatches++;
+                    diagnosticLog.push(` Blok #${hunkIndex}: Eksak Cocok (Baris ${cursor.from().line + 1})`);
+                } else {
+                    const docLines = cmEditor.getValue().split('\n');
+                    let bestMatch = null;
+                    let bestScore = 0.35; 
+                    const oldLinesArr = normalizedOldStr.split('\n');
+                    const N = oldLinesArr.length;
+                    const windowSizes = [N - 2, N - 1, N, N + 1, N + 2].filter(w => w > 0);
+                    
+                    // Optimasi Performa: Gunakan anchor untuk bypass iterasi berat
+                    const anchor = oldLinesArr.find(l => l.trim().length > 5) || oldLinesArr[0];
+                    
+                    for (let i = 0; i < docLines.length; i++) {
+                        // FAST SKIP: Lompati iterasi jika sekitar baris ini tidak ada teks yang mirip
+                        if (anchor && !docLines.slice(Math.max(0, i-2), i+3).join('\n').includes(anchor.trim())) continue;
+                        
+                        for (let w of windowSizes) {
+                            if (i + w > docLines.length) continue;
+                            const windowText = docLines.slice(i, i + w).join('\n');
+                            const score = calculateSimilarity(normalizedOldStr, windowText);
+                            if (score > bestScore) {
+                                bestScore = score;
+                                bestMatch = { from: {line: i, ch: 0}, to: {line: i + w - 1, ch: docLines[i + w - 1].length}, score: score };
+                            }
+                        }
+                    }
+                    
+                    if (bestMatch) {
+                        const marker = cmEditor.markText(bestMatch.from, bestMatch.to, { className: "pending-diff-marker" });
+                        pendingReplacements.push({ marker, hunkReplaceText: newStr, originalFrom: bestMatch.from, originalTo: bestMatch.to });
+                        fuzzyMatches++;
+                        diagnosticLog.push(` Blok #${hunkIndex}: Fuzzy Cocok ${Math.round(bestMatch.score * 100)}% (Baris ${bestMatch.from.line + 1})`);
+                    } else {
+                        failedMatches++;
+                        diagnosticLog.push(` Blok #${hunkIndex}: MISMATCH ❌`);
+                    }
+                }
+            };
+
+            let hunkCount = 0;
+            for (let line of lines) {
+                const cleanLine = line.replace(/[\r\n]/g, '');
+                if (cleanLine.startsWith('@@ ')) {
+                    hunkCount++;
+                    if (inHunk) locateAndPushHunk(oldLines.join('\n'), newLines.join('\n'), hunkCount - 1);
+                    oldLines = []; newLines = []; inHunk = true; continue;
+                }
+if (inHunk) {
+                    if (cleanLine.startsWith('-')) {
+                        oldLines.push(cleanLine.slice(1));
+                    } else if (cleanLine.startsWith('+')) {
+                        newLines.push(cleanLine.slice(1));
+                    } else if (cleanLine.startsWith('\\')) {
+                        // Abaikan baris info bawaan git seperti "\ No newline at end of file"
+                    } else if (cleanLine.startsWith('---') || cleanLine.startsWith('+++') || cleanLine.startsWith('diff ') || cleanLine.startsWith('index ')) {
+                        locateAndPushHunk(oldLines.join('\n'), newLines.join('\n'), hunkCount);
+                        oldLines = []; newLines = []; inHunk = false;
+                    } else {
+                        // FALLBACK SUPER AMAN: Jika bukan penanda operasi diff, pasti ini baris context!
+                        // Ini akan menangkap kode dengan sempurna meskipun AI lupa menaruh awalan spasi.
+                        const content = (cleanLine.startsWith(' ') || cleanLine.startsWith('\t')) ? cleanLine.slice(1) : cleanLine;
+                        oldLines.push(content);
+                        newLines.push(content);
+                    }
+                }
+            }
+            if (inHunk) locateAndPushHunk(oldLines.join('\n'), newLines.join('\n'), hunkCount);
+
+            // --- PRE-CHECK ERROR HANDLING 2: Format Berkas Salah / Tidak Ada Simbol @@ ---
+            if (totalHunksFound === 0) {
+                statusEl.className = "whitespace-nowrap text-[11px] text-red-600 font-bold px-2 py-0.5 bg-red-100 rounded";
+                statusEl.innerText = "Error: Format Salah";
+                alert("⚠️ BOTTLENECK DETECTED: FORMAT PATCH TIDAK VALID!\n\nAplikasi gagal menemukan simbol penanda hunk ('@@ -lines +lines @@') pada teks yang Anda tempel.\n\nSolusi:\nPastikan Anda menyalin seluruh output kode dari chatbot beserta simbol penanda lokasinya, bukan cuma baris kodenya saja.");
+                return;
+            }
+
+            // --- PRE-CHECK ERROR HANDLING 3: Semua Blok Hunk Mengalami Mismatch ---
+            if (pendingReplacements.length === 0) {
+                statusEl.className = "whitespace-nowrap text-[11px] text-red-600 font-bold px-2 py-0.5 bg-red-100 rounded";
+                statusEl.innerText = "Error: Mismatch Total";
+                alert(`❌ BOTTLENECK DETECTED: KODE TIDAK COCOK (0/${totalHunksFound} Berhasil)\n\nLog Validasi:\n${diagnosticLog.join('\n')}\n\nSolusi:\nChatbot Anda membuat Git Patch berdasarkan versi kode yang salah / sudah kedaluwarsa. Silakan berikan seluruh kode aktif Anda saat ini ke chatbot dan minta ia membuat Git Diff ulang.`);
+                return;
+            }
+
+            // NOTIFIKASI INFORMASI JIKA ADA SEBAGIAN BLOK YANG MISMATCH (PARTIAL MATCH)
+            if (failedMatches > 0) {
+                alert(`⚠️ INFORMASI: PARTIAL PATCH DETECTED\n\nDari total ${totalHunksFound} perubahan yang diajukan chatbot:\n- Cocok Eksak: ${exactMatches}\n- Cocok Fuzzy: ${fuzzyMatches}\n- Gagal Menemukan Baris: ${failedMatches}\n\nAplikasi akan memunculkan pop-up preview khusus untuk ${pendingReplacements.length} blok yang lolos pengecekan.`);
+            } else {
+                showToast(`Pengecekan Sukses! ${pendingReplacements.length} Blok Cocok.`);
+            }
+
+            // Konfigurasi ulang UI Status Sukses dan Luncurkan Pop Up Preview Card
+            statusEl.className = "whitespace-nowrap text-[11px] text-green-700 font-medium px-2 py-0.5 bg-green-200 rounded";
+            statusEl.innerText = `${pendingReplacements.length}/${totalHunksFound} Blok Siap`;
+            
+            // Perbaikan Bug: Gunakan 'originalFrom' karena struktur sudah kita update sebelumnya
+            pendingReplacements.sort((a, b) => b.originalFrom.line - a.originalFrom.line);
+            resolvedChanges = 0;
+            
+            // Tampilkan tombol preview manual di sebelah badge status
+            const btnPreview = document.getElementById('btn-show-preview-patch');
+            if(btnPreview) btnPreview.classList.remove('hidden');
+
+            renderDiffModal("");
+        };
+
         const renderDiffModal = (replaceText) => {
             const container = document.getElementById('diff-blocks-container');
-            container.innerHTML = '';
+            let htmlContent = ''; // Buffer untuk menghindari Reflow
             UI.searchStatus.innerText = `${pendingReplacements.length} Antrean Replace`;
             document.getElementById('diff-status-text').innerText = `1 / ${pendingReplacements.length} Blok Tertunda`;
 
             pendingReplacements.forEach((match, index) => {
-                // Ambil konteks 3 baris ke atas dan 3 baris ke bawah
-                const startLine = Math.max(0, match.from.line - 3);
-                const endLine = Math.min(cmEditor.lineCount() - 1, match.to.line + 3);
+                const currentReplace = match.hunkReplaceText !== undefined ? match.hunkReplaceText : replaceText;
                 
-                // Ambil teks asli secara utuh (Konteks + Teks Lama + Konteks)
+                // Ambil posisi dinamis (update otomatis jika baris digeser operasi lain)
+                const pos = match.marker.find() || { from: match.originalFrom, to: match.originalTo };
+
+                const startLine = Math.max(0, pos.from.line - 3);
+                const endLine = Math.min(cmEditor.lineCount() - 1, pos.to.line + 3);
+                
                 const oldTextFull = cmEditor.getRange({line: startLine, ch: 0}, {line: endLine, ch: cmEditor.getLine(endLine).length});
+                const textBeforeMatch = cmEditor.getRange({line: startLine, ch: 0}, pos.from);
+                const textAfterMatch = cmEditor.getRange(pos.to, {line: endLine, ch: cmEditor.getLine(endLine).length});
+                const newTextFull = textBeforeMatch + currentReplace + textAfterMatch;
 
-                // Buat simulasi teks baru (Konteks + Teks Baru + Konteks)
-                const textBeforeMatch = cmEditor.getRange({line: startLine, ch: 0}, match.from);
-                const textAfterMatch = cmEditor.getRange(match.to, {line: endLine, ch: cmEditor.getLine(endLine).length});
-                const newTextFull = textBeforeMatch + replaceText + textAfterMatch;
-
-                // Eksekusi JsDiff
                 const diffParts = Diff.diffLines(oldTextFull, newTextFull);
                 let diffHtml = '';
 
@@ -1057,45 +1352,45 @@ if(device === 'mobile') {
                                        'text-gray-500 bg-transparent border-l-4 border-transparent';
                     
                     const prefix = isAdded ? '+ ' : isRemoved ? '- ' : '  ';
-                    
-                    // Hindari render tag HTML di dalam Modal
                     const escapedValue = part.value.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
                     
-                    // Render baris
                     if(escapedValue.trim() !== "" || part.value.includes('\n')) {
-                        diffHtml += `<div class="whitespace-pre-wrap font-mono text-[13px] leading-relaxed px-4 py-0.5 ${colorClass}">${prefix}${escapedValue}</div>`;
+                        diffHtml += `<div class="whitespace-pre w-max min-w-full font-mono text-[13px] leading-relaxed px-4 py-0.5 ${colorClass}">${prefix}${escapedValue}</div>`;
                     }
                 });
 
-                container.innerHTML += `
+                htmlContent += `
                     <div id="diff-block-${index}" class="bg-white border border-gray-200 rounded-xl overflow-hidden shadow-sm transition-all duration-300">
                         <div class="bg-gray-50 px-5 py-3 border-b border-gray-200 flex justify-between items-center">
-                            <span class="text-xs font-bold text-gray-500 uppercase tracking-widest">Baris ${match.from.line + 1} &rarr; ${match.to.line + 1}</span>
-                            <div class="flex gap-2.5">
-                                <button onclick="skipChange(${index})" class="px-4 py-1.5 text-xs font-bold text-gray-600 bg-white border border-gray-300 rounded-md hover:bg-gray-100 hover:text-black transition">Lewati (Skip)</button>
-                                <button onclick="applyChange(${index}, \`${encodeURIComponent(replaceText)}\`)" class="flex items-center gap-1.5 px-4 py-1.5 text-xs font-bold text-white bg-[#5c8d42] hover:bg-[#4a7235] rounded-md transition shadow-sm">
+                            <span class="text-xs font-bold text-gray-500 uppercase tracking-widest">Baris ${pos.from.line + 1} &rarr; ${pos.to.line + 1}</span>
+                        <div class="flex gap-2.5">
+                            <button onclick="skipChange(${index})" class="px-4 py-1.5 text-xs font-bold text-gray-600 bg-white border border-gray-300 rounded-md hover:bg-gray-100 hover:text-black transition">Lewati (Skip)</button>
+                                <button onclick="applyChange(${index})" class="flex items-center gap-1.5 px-4 py-1.5 text-xs font-bold text-white bg-[#5c8d42] hover:bg-[#4a7235] rounded-md transition shadow-sm">
                                     <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
                                     Terima (Apply)
                                 </button>
                             </div>
                         </div>
-                        <div class="overflow-x-auto bg-white py-2">
+                        <div class="overflow-auto max-h-[45vh] bg-white py-2">
                             ${diffHtml}
                         </div>
                     </div>
                 `;
             });
+        container.innerHTML = htmlContent; // Pasang ke DOM sekaligus
+        document.getElementById('diff-review-modal').classList.remove('hidden');
+    };
 
-            document.getElementById('diff-review-modal').classList.remove('hidden');
-        };
+    const applyChange = (index) => {
+        const match = pendingReplacements[index];
+        const replaceText = match.hunkReplaceText !== undefined ? match.hunkReplaceText : UI.replaceInput.value;
+        
+        const pos = match.marker.find();
+        if (!pos) return showToast("Gagal: Baris sudah diubah operasi lain.");
 
-        const applyChange = (index, encodedReplaceText) => {
-            const replaceText = decodeURIComponent(encodedReplaceText);
-            const match = pendingReplacements[index];
-            
-            // Terapkan ke Editor CodeMirror
             cmEditor.operation(() => {
-                cmEditor.replaceRange(replaceText, match.from, match.to);
+                cmEditor.replaceRange(replaceText, pos.from, pos.to);
+                match.marker.clear(); // Hapus marker setelah diterapkan
             });
             
             // Update UI
@@ -1116,6 +1411,43 @@ if(device === 'mobile') {
             
             checkAllResolved();
         };
+      
+      const applyAllPendingChanges = () => {
+            if (!confirm("Yakin ingin menerapkan SEMUA perubahan sekaligus?\nPastikan Anda sudah me-review sekilas agar kode tidak rusak karena halusinasi AI.")) return;
+
+            // cmEditor.operation membungkus semua replace menjadi 1 Undo (Ctrl+Z)
+            cmEditor.operation(() => {
+                pendingReplacements.forEach((match, index) => {
+                    // Skip jika user sudah memproses blok ini secara manual sebelumnya
+                    const block = document.getElementById(`diff-block-${index}`);
+                    if (block && block.style.pointerEvents === 'none') return;
+
+                    const replaceText = match.hunkReplaceText !== undefined ? match.hunkReplaceText : UI.replaceInput.value;
+                    const pos = match.marker.find();
+                    
+                    if (pos) {
+                        cmEditor.replaceRange(replaceText, pos.from, pos.to);
+                        match.marker.clear();
+                        
+                        // Update visual DOM block
+                        if (block) {
+                            block.style.opacity = '0.5';
+                            block.style.pointerEvents = 'none';
+                            block.querySelector('.bg-gray-50').innerHTML = `<span class="text-xs font-bold text-green-600 px-2 uppercase tracking-widest flex items-center gap-1"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> Otomatis Diterapkan</span>`;
+                        }
+                        resolvedChanges++;
+                    }
+                });
+            });
+
+            triggerAutoSave();
+            document.getElementById('diff-status-text').innerText = `Semua Selesai`;
+            
+            setTimeout(() => {
+                closeDiffModal();
+                showToast("Semua perubahan berhasil diterapkan secara massal!");
+            }, 800);
+        };
 
         const checkAllResolved = () => {
             resolvedChanges++;
@@ -1132,12 +1464,25 @@ if(device === 'mobile') {
 
         const closeDiffModal = () => {
             document.getElementById('diff-review-modal').classList.add('hidden');
+            // Bersihkan memori dari marker yang di-skip
+            pendingReplacements.forEach(match => {
+                if (match.marker) match.marker.clear();
+            });
             pendingReplacements = [];
             resolvedChanges = 0;
-            if(activeSearchMode === 'fuzzy') {
-                lastFuzzyTerm = ""; 
-                fuzzyResults = [];
+            
+            // Reset UI Tombol Preview Patch ke kondisi awal
+            const btnPreview = document.getElementById('btn-show-preview-patch');
+            if(btnPreview) btnPreview.classList.add('hidden');
+            const statusEl = document.getElementById('git-patch-status');
+            if(statusEl) {
+                statusEl.className = "whitespace-nowrap text-[11px] text-slate-500 font-medium px-2 py-0.5 bg-slate-200 rounded";
+                statusEl.innerText = "Ready";
             }
+            
+            // Cegah state memory leak secara penuh
+            lastFuzzyTerm = ""; 
+            fuzzyResults = [];
         };
 
         const deleteFound = () => {
@@ -1251,12 +1596,15 @@ if(device === 'mobile') {
         };
 
         // --- File Download Feature ---
-        const downloadHTMLFile = () => {
-            if (!cmEditor) return;
-            const content = cmEditor.getValue();
-            const fileName = UI.activeFileName.innerText || 'project.html';
-            
-            const blob = new Blob([content], { type: 'text/html' });
+const downloadHTMLFile = () => {
+            if (!cmEditor) return;
+            const content = cmEditor.getValue();
+            // Sanitasi nama file dari karakter ilegal OS Windows/Mac/Linux
+            let fileName = UI.activeFileName.innerText || 'project.html';
+            fileName = fileName.replace(/[\/\\?%*:|"<>]/g, '-');
+            
+            // Set charset UTF-8 agar emoji dan karakter spesial tidak rusak
+            const blob = new Blob([content], { type: 'text/html;charset=utf-8' });
             const a = document.createElement('a');
             a.href = URL.createObjectURL(blob);
             a.download = fileName;
@@ -1284,6 +1632,7 @@ if(device === 'mobile') {
         let isToastActive = false;
 
         const showToast = (msg) => {
+            playSatisfyingPop(); // Trigger suara setiap kali ada aksi/notifikasi sukses
             toastQueue.push(msg);
             if (!isToastActive) processToastQueue();
         };
